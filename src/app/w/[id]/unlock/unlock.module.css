@@ -1,0 +1,25 @@
+.page { display: flex; flex-direction: column; gap: 18px; min-height: 100%; }
+.notNow { align-self: flex-start; display: inline-flex; align-items: center; min-height: 44px; font-size: 14px; font-weight: 600; color: var(--raspberry-ink); text-decoration: none; }
+.brand { display: flex; align-items: center; gap: 10px; }
+.brand :global(.tn-wordmark) { font-size: 32px; line-height: 1; }
+.title { margin: 0; font-family: var(--font-display); font-variation-settings: 'SOFT' 100, 'WONK' 1; font-weight: 600; font-size: 28px; line-height: 34px; }
+.lead { margin: 0; font-size: 15px; line-height: 22px; }
+.chip { align-self: flex-start; }
+.ticks { margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 8px; font-size: 15px; line-height: 22px; }
+.ticks li { display: flex; gap: 10px; }
+.ticks li span { color: var(--leaf); font-weight: 700; }
+.offer { display: flex; align-items: center; gap: 12px; padding: 16px; border-radius: var(--radius-md); border: 2px solid var(--raspberry); background: var(--sugar); }
+.offerText { flex: 1; display: flex; flex-direction: column; gap: 2px; }
+.offerText b { font-size: 16px; }
+.offerText span { font-size: 13px; line-height: 18px; color: var(--ink-muted); }
+.price { font-family: var(--font-display); font-variation-settings: 'SOFT' 100; font-weight: 600; font-size: 28px; }
+.currencies { margin: 0; padding: 0; border: none; display: flex; flex-wrap: wrap; gap: 8px; }
+.currencies legend { font-size: 14px; font-weight: 600; margin-bottom: 6px; padding: 0; }
+.currency { display: inline-flex; align-items: center; gap: 8px; min-height: 44px; padding: 0 12px; border: 1px solid var(--line); border-radius: var(--radius-full); background: var(--surface); font-size: 14px; cursor: pointer; }
+.currency input { width: 20px; height: 20px; margin: 0; accent-color: var(--raspberry); }
+.currency:has(input:checked) { border-color: var(--raspberry); }
+.currency:has(input:focus-visible) { box-shadow: var(--focus-ring); }
+.test { margin: 0; padding: 12px; border-radius: var(--radius-md); background: var(--amber-soft); font-size: 13px; line-height: 18px; }
+.bottom { display: flex; flex-direction: column; gap: 8px; margin-top: auto; }
+.small { margin: 0; font-size: 13px; line-height: 18px; text-align: center; color: var(--ink-muted); }
+.fine { font-size: 12px; line-height: 17px; text-align: center; color: var(--ink-muted); }

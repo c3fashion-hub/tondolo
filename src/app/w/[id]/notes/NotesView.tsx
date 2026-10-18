@@ -1,6 +1,7 @@
 "use client";
 
 import { useRef, useState } from "react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { FunctionsHttpError } from "@supabase/supabase-js";
 import { Button, MicButton, StatusChip } from "@/components/ui";
@@ -195,7 +196,7 @@ export function NotesView(props: NotesProps) {
             <Button variant={props.unlocked ? "secondary" : "primary"} onClick={save} disabled={busy !== ""}>{busy === "saving" ? "Saving…" : props.unlocked ? "Just save the note" : "Save note"}</Button>
           </div>
         )}
-        {!props.unlocked ? <p className={styles.hint}>Once Tondolo is unlocked, we&rsquo;ll suggest what to file from each note.</p> : null}
+        {!props.unlocked ? <p className={styles.hint}>Once Tondolo is unlocked, we&rsquo;ll suggest what to file from each note. <Link href={`/w/${weddingId}/unlock`}>Unlock Tondolo</Link></p> : null}
       </section>
 
       {open.length || done.length ? (

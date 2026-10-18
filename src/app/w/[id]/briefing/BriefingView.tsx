@@ -51,6 +51,7 @@ export function BriefingView(props: BriefingProps) {
             <span className={styles.kicker}>This week, out loud</span>
             <h1 className={styles.headline}>Your weekly briefing</h1>
             <p style={{ margin: 0, fontSize: 17, lineHeight: "26px" }}>Each week we&rsquo;ll read out what needs you, in your phone&rsquo;s own voice. It comes with Tondolo unlocked.</p>
+            <Link href={`/w/${props.weddingId}/unlock`} className={styles.play} style={{ display: "flex", alignItems: "center", justifyContent: "center", textDecoration: "none" }}>Unlock Tondolo</Link>
           </div>
         ) : (
           <>

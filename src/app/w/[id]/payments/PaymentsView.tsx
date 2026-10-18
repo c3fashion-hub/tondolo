@@ -102,7 +102,7 @@ export function PaymentsView(props: ViewProps) {
         ) : null}
         <Button onClick={() => setEditing("new")} block variant={props.seeAll ? "secondary" : "primary"}>Add a payment by hand</Button>
         {!unlocked ? (
-          <p className="tn-small tn-muted">Free start: {Math.min(real.length, FREE_LIMIT)} of {FREE_LIMIT} payments added{props.seeAll ? ", and 1 document to scan" : ""}.</p>
+          <p className="tn-small tn-muted">Free start: {Math.min(real.length, FREE_LIMIT)} of {FREE_LIMIT} payments added{props.seeAll ? ", and 1 document to scan" : ""}. <Link href={`/w/${props.weddingId}/unlock`}>Unlock Tondolo</Link></p>
         ) : null}
       </section>
 

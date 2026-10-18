@@ -12,13 +12,14 @@ import { Settings } from "@/app/w/[id]/settings/Settings";
 import { can } from "@/lib/roles.ts";
 import { NotesView } from "@/app/w/[id]/notes/NotesView";
 import { BriefingView } from "@/app/w/[id]/briefing/BriefingView";
+import { UnlockView } from "@/app/w/[id]/unlock/UnlockView";
 import {
   BOOKINGS, BUDGETS, CONTRACT_CHECKS, DESTINATION, NOTES, PAYMENTS, PEOPLE, RATES, REMINDERS, SUPPLIERS, TODAY, WEDDING_DATE,
 } from "@/lib/example/wedding.ts";
 import styles from "@/app/w/[id]/shell.module.css";
 
 // Local preview of the money screens with the example wedding. Never served on the live site.
-// ?screen=overview | first | health | budget | cash | scan | contract | settings | notes | briefing | supplier&id=s-rita, or payments by default.
+// ?screen=overview | first | health | budget | cash | scan | contract | settings | notes | briefing | unlock | supplier&id=s-rita, or payments by default.
 export default async function MoneyPreview({ searchParams }: { searchParams: Promise<{ screen?: string; id?: string }> }) {
   const { screen, id } = await searchParams; // read first, so this page is built per request
   if (process.env.TONDOLO_PREVIEW !== "1") notFound();
@@ -42,6 +43,7 @@ export default async function MoneyPreview({ searchParams }: { searchParams: Pro
     view = <BriefingView {...common} name="Ade" meId="m-ade" unlocked people={PEOPLE} reminders={REMINDERS} preview closeHref="/dev/money?screen=overview"
       checkin={{ day: 7, at_time: "19:00", second_day: 3, time_zone: "Europe/London" }} />;
   }
+  else if (screen === "unlock") view = <UnlockView weddingId="example" owner unlocked={false} used={3} currency="GBP" sessionId={null} cancelled={false} preview />;
   else if (screen === "cash") view = <CashView {...common} preview />;
   else if (screen === "supplier") {
     const sup = SUPPLIERS.find((x) => x.id === id) ?? SUPPLIERS[0];
