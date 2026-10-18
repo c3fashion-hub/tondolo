@@ -28,3 +28,27 @@ test("the check-in sheet offers a second day for the final six weeks", async ({ 
   await expect(sheet.getByLabel("Second day")).toHaveCount(0);
   expect((await axe(page)).violations).toEqual([]);
 });
+
+test("Settings offers the spreadsheet and, for the owner, Delete everything behind a typed confirmation", async ({ page }) => {
+  await page.goto("/dev/money?screen=settings");
+  await expect(page.getByRole("link", { name: "Download a spreadsheet" })).toBeVisible();
+  await expect(page.getByRole("link", { name: "Terms" })).toHaveAttribute("href", "/terms");
+  await page.getByRole("button", { name: "Delete everything" }).click();
+  const sheet = page.getByRole("dialog", { name: "Delete everything" });
+  await expect(sheet.getByText(/It can’t be undone/)).toBeVisible();
+  await sheet.getByRole("button", { name: "Delete everything" }).click();
+  await expect(sheet.getByText("Type the word delete to confirm.")).toBeVisible();
+  await sheet.getByLabel("Type delete to confirm").fill("delete");
+  await sheet.getByRole("button", { name: "Delete everything" }).click();
+  await expect(sheet.getByText("This is the preview, so nothing was deleted.")).toBeVisible();
+  expect((await axe(page)).violations).toEqual([]);
+});
+
+test("the privacy policy and terms are public, and say they're drafts until approved", async ({ page }) => {
+  for (const [path, title] of [["/privacy", "Privacy"], ["/terms", "Terms"]]) {
+    await page.goto(path);
+    await expect(page.getByRole("heading", { level: 1, name: title })).toBeVisible();
+    await expect(page.getByText("Draft, not yet approved")).toBeVisible();
+    expect((await axe(page)).violations).toEqual([]);
+  }
+});
