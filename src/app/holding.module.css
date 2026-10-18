@@ -1,0 +1,10 @@
+.screen {
+  max-width: 480px; min-height: 100dvh; margin: 0 auto;
+  padding: calc(40px + env(safe-area-inset-top, 0px)) 20px calc(24px + env(safe-area-inset-bottom, 0px));
+  display: flex; flex-direction: column; gap: var(--space-6);
+}
+.card { display: flex; flex-direction: column; gap: var(--space-3); padding: 18px var(--space-4); border-radius: var(--radius-md); background: var(--surface); border: 1px solid var(--line); }
+.card p { margin: 0; font-size: 15px; line-height: 22px; }
+.list { margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: var(--space-2); font-size: 15px; line-height: 22px; }
+.list b { font-weight: 600; }
+.back { font-size: 14px; font-weight: 600; color: var(--raspberry-ink); text-decoration: none; }

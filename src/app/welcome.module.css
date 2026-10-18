@@ -1,0 +1,22 @@
+.screen {
+  max-width: 480px; min-height: 100dvh; margin: 0 auto;
+  padding: calc(40px + env(safe-area-inset-top, 0px)) 20px calc(24px + env(safe-area-inset-bottom, 0px));
+  display: flex; flex-direction: column; gap: var(--space-6);
+}
+.brand { display: flex; align-items: center; gap: var(--space-3); }
+.brand > svg { flex: none; }
+.brandText { display: flex; flex-direction: column; min-width: 0; }
+.tagline { font-size: 14px; line-height: 20px; color: var(--ink-muted); margin-top: var(--space-1); }
+.intro { display: flex; flex-direction: column; gap: 6px; }
+.lead { margin: 0; font-size: 15px; line-height: 22px; color: var(--ink-muted); }
+
+.form { display: flex; flex-direction: column; gap: var(--space-6); flex: 1; }
+.fields { display: flex; flex-direction: column; gap: var(--space-4); }
+.starter {
+  display: flex; gap: 10px; align-items: flex-start; padding: var(--space-3);
+  border-radius: var(--radius-md); background: var(--sugar); font-size: 14px; line-height: 20px; cursor: pointer;
+}
+.starter input { flex: none; width: 20px; height: 20px; margin: 0; accent-color: var(--raspberry); }
+.actions { display: flex; flex-direction: column; gap: 10px; margin-top: auto; }
+.notice { margin: 0; font-size: 12px; line-height: 17px; text-align: center; color: var(--ink-muted); }
+.actions a { text-decoration: none; }
