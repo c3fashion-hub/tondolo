@@ -92,6 +92,11 @@ insert into public.payments (wedding_id, title, amount_minor, currency, paying_m
   (current_setting('t.wid')::uuid, 'Caterer – deposit', 336000, 'EUR', current_setting('t.mum_id')::uuid),
   (current_setting('t.wid')::uuid, 'Photographer – balance', 175000, 'EUR', current_setting('t.tunde_id')::uuid),
   (current_setting('t.wid')::uuid, 'Venue hire – balance', 1820000, 'EUR', null);
+-- Ade records what the venue's contract has in place (the contract check fills this in from stage 5).
+select set_config('t.quinta', public.ensure_supplier(current_setting('t.wid')::uuid, 'Quinta do Rio')::text, true);
+insert into public.contract_checks (wedding_id, supplier_id, clauses) values (current_setting('t.wid')::uuid, current_setting('t.quinta')::uuid,
+  '{"payment_schedule":{"state":"present"},"named_people":{"state":"incomplete"},"supplier_cancels":{"state":"missing"}}');
+select pg_temp.expect_error($$insert into public.contract_checks (wedding_id, supplier_id, clauses) values (current_setting('t.wid')::uuid, current_setting('t.quinta')::uuid, '{"named_people":{"state":"maybe"}}')$$, '23514', 'a clause is present, incomplete or missing');
 reset role;
 
 -- Mum sees and edits only what she covers.
@@ -105,10 +110,12 @@ do $$ begin
   assert pg_temp.rows($q$delete from public.payments where title = 'Venue hire – balance'$q$) = 0, 'Mum cannot delete the couple''s payment';
   assert pg_temp.rows($q$update public.weddings set destination = 'Lisbon'$q$) = 0, 'Mum cannot change settings';
   assert (select committed from public.wedding_progress(current_setting('t.wid')::uuid)) > 0, 'Mum sees overall progress';
+  assert (select count(*) from public.contract_checks) = 0, 'Mum sees no contract checks';
 end $$;
 select pg_temp.expect_error($$update public.payments set paying_member_id = current_setting('t.tunde_id')::uuid where title = 'Caterer – deposit'$$, '42501', 'Mum cannot hand her payment to someone else');
 select pg_temp.expect_error($$insert into public.payments (wedding_id, title, amount_minor, currency, paying_member_id) values (current_setting('t.wid')::uuid, 'Sneaky', 100, 'EUR', current_setting('t.tunde_id')::uuid)$$, '42501', 'Mum cannot add a payment for someone else');
 select pg_temp.expect_error($$insert into public.payments (wedding_id, title, amount_minor, currency) values (current_setting('t.wid')::uuid, 'Sneaky', 100, 'EUR')$$, '42501', 'Mum cannot add a payment the couple cover');
+select pg_temp.expect_error($$insert into public.booking_confirmations (wedding_id, supplier_id) values (current_setting('t.wid')::uuid, current_setting('t.quinta')::uuid)$$, '42501', 'Mum cannot record a booking confirmation');
 insert into public.payments (wedding_id, title, amount_minor, currency, paying_member_id) values (current_setting('t.wid')::uuid, 'Cake', 40000, 'EUR', current_setting('t.mum_id')::uuid);
 select pg_temp.expect_error($$select public.invite_member(current_setting('t.wid')::uuid, 'family', 'Auntie', 'auntie@example.test')$$, 'not_allowed', 'family cannot invite');
 reset role;
@@ -119,7 +126,9 @@ do $$ begin
   assert (select count(*) from public.payments) = 4, 'planner sees every payment';
   assert (select count(*) from public.members) = 5, 'planner sees everyone';
   assert pg_temp.rows($q$update public.weddings set destination = 'Lisbon'$q$) = 0, 'planner cannot change settings';
+  assert (select count(*) from public.contract_checks) = 1, 'planner sees contract checks';
 end $$;
+insert into public.booking_confirmations (wedding_id, supplier_id, language, arrive_at, confirmed_on) values (current_setting('t.wid')::uuid, current_setting('t.quinta')::uuid, 'pt', '13:00', current_date);
 insert into public.payments (wedding_id, title, amount_minor, currency) values (current_setting('t.wid')::uuid, 'Florist – deposit', 90000, 'EUR');
 select pg_temp.expect_error($$select public.invite_member(current_setting('t.wid')::uuid, 'family', 'Auntie', 'auntie@example.test')$$, 'not_allowed', 'planner cannot invite');
 select pg_temp.expect_error($$select public.remove_member(current_setting('t.mum_id')::uuid)$$, 'not_allowed', 'planner cannot remove people');
@@ -145,6 +154,13 @@ end $$;
 select pg_temp.expect_error($$select * from public.wedding_progress(current_setting('t.wid')::uuid)$$, 'not_allowed', 'removed person sees no progress');
 reset role;
 
+-- A stranger with their own wedding can't attach a check to someone else's supplier.
+select pg_temp.act_as('stranger');
+select set_config('t.other', public.create_wedding('GBP', '2027-09-01', 'Seville, Spain', null, null, true, 'Stranger')::text, true);
+select pg_temp.expect_error($$insert into public.contract_checks (wedding_id, supplier_id, clauses) values (current_setting('t.other')::uuid, current_setting('t.quinta')::uuid, '{}')$$, '23503', 'a check must be for a supplier in the same wedding');
+do $$ begin assert (select count(*) from public.contract_checks) = 0, 'stranger sees no contract checks'; end $$;
+reset role;
+
 -- Only the owner can delete the wedding, and everything goes with it.
 select pg_temp.act_as('ade');
 do $$ begin assert pg_temp.rows($q$delete from public.weddings$q$) = 1, 'owner can delete the wedding'; end $$;
@@ -152,6 +168,8 @@ reset role;
 do $$ begin
   assert (select count(*) from public.payments where wedding_id = current_setting('t.wid')::uuid) = 0, 'payments deleted with the wedding';
   assert (select count(*) from public.members where wedding_id = current_setting('t.wid')::uuid) = 0, 'places deleted with the wedding';
+  assert (select count(*) from public.contract_checks where wedding_id = current_setting('t.wid')::uuid) = 0, 'contract checks deleted with the wedding';
+  assert (select count(*) from public.booking_confirmations where wedding_id = current_setting('t.wid')::uuid) = 0, 'booking confirmations deleted with the wedding';
 end $$;
 
 select 'ALL ROLE TESTS PASSED' as result;

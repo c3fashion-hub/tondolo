@@ -10,6 +10,8 @@ import { formatShortDate } from "@/lib/dates.ts";
 import { homeValue, statusOf, METHOD_LABEL, type Payment } from "@/lib/payments.ts";
 import type { PersonOption } from "@/lib/money-data.ts";
 import type { Role } from "@/lib/roles.ts";
+import { protectionFor, type BookingConfirmation, type ContractCheck } from "@/lib/protection.ts";
+import { SupplierList } from "@/components/health/SupplierList";
 import { PaymentSheet } from "./PaymentSheet";
 import { PaidSheet } from "./PaidSheet";
 import styles from "./payments.module.css";
@@ -17,6 +19,7 @@ import styles from "./payments.module.css";
 export type ViewProps = {
   weddingId: string; home: string; unlocked: boolean; payments: Payment[]; people: PersonOption[];
   suppliers: { id: string; name: string }[]; rates: RateRow[]; me: { id: string; role: Role }; seeAll: boolean; today: string;
+  weddingDate: string; checks: ContractCheck[]; bookings: BookingConfirmation[];
 };
 
 export const FREE_LIMIT = 5;
@@ -33,6 +36,9 @@ export function PaymentsView(props: ViewProps) {
   const upcoming = real.filter((p) => p.status === "due").sort((a, b) => (a.due_on ?? "9999").localeCompare(b.due_on ?? "9999"));
   const planned = payments.filter((p) => p.is_estimate).sort((a, b) => (a.due_on ?? "9999").localeCompare(b.due_on ?? "9999"));
   const paid = real.filter((p) => p.status === "paid").sort((a, b) => (b.paid_on ?? "").localeCompare(a.paid_on ?? ""));
+  const protections = props.seeAll
+    ? props.suppliers.map((s) => protectionFor(s, payments, props.checks, props.bookings, props.weddingDate, home, book, today)).filter((s) => s.committed > 0)
+    : [];
   const nameOf = (id: string | null) => (id ? people.find((m) => m.id === id)?.name : null);
 
   function row(p: Payment) {
@@ -70,6 +76,13 @@ export function PaymentsView(props: ViewProps) {
           <p className="tn-small tn-muted">Free start: {Math.min(real.length, FREE_LIMIT)} of {FREE_LIMIT} payments added. Scanning quotes and invoices comes soon.</p>
         ) : null}
       </section>
+
+      {protections.length ? (
+        <section aria-labelledby="sup-h">
+          <h2 id="sup-h" className="tn-heading">Your suppliers</h2>
+          <SupplierList suppliers={protections} home={home} />
+        </section>
+      ) : null}
 
       <section aria-labelledby="up-h">
         <h2 id="up-h" className="tn-heading">Coming up</h2>

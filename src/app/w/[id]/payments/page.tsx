@@ -21,6 +21,9 @@ export default async function PaymentsPage({ params }: { params: Promise<{ id: s
       me={{ id: data.me.id, role: data.me.role }}
       seeAll={can(data.me.role).seeAllPayments}
       today={todayIn()}
+      weddingDate={data.wedding.wedding_date}
+      checks={data.checks}
+      bookings={data.bookings}
     />
   );
 }

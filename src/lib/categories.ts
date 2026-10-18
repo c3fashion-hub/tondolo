@@ -87,9 +87,15 @@ export const PLANS: Record<Plan, { share: number; when: "book" | number; label: 
   dress: [{ share: 50, when: "book", label: "deposit" }, { share: 50, when: 60, label: "balance" }],
 };
 
-// Costs couples most often forget (used by the health check in stage 4).
-export const COMMONLY_FORGOTTEN: string[][] = [
-  ["Supplier transfers: home to airport and back, both ends", "Supplier transfers: airport to accommodation and back", "Supplier transfers: accommodation to venue, each working day"],
-  ["Supplier flights"], ["Supplier accommodation"], ["Supplier food allowance"], ["Local taxes and tourist tax"],
-  ["Currency, card and bank fees"], ["Guest transport and transfers"], ["Contingency"], ["Final invoices, overtime and tips"],
+// Costs couples most often forget, for the money health check. The three supplier transfer lines count as one.
+export const COMMONLY_FORGOTTEN: { label: string; categories: string[] }[] = [
+  { label: "supplier transfers", categories: ["Supplier transfers: home to airport and back, both ends", "Supplier transfers: airport to accommodation and back", "Supplier transfers: accommodation to venue, each working day"] },
+  { label: "supplier flights", categories: ["Supplier flights"] },
+  { label: "supplier accommodation", categories: ["Supplier accommodation"] },
+  { label: "supplier food allowance", categories: ["Supplier food allowance"] },
+  { label: "local and tourist tax", categories: ["Local taxes and tourist tax"] },
+  { label: "currency, card and bank fees", categories: ["Currency, card and bank fees"] },
+  { label: "guest transport", categories: ["Guest transport and transfers"] },
+  { label: "contingency", categories: ["Contingency"] },
+  { label: "final invoices, overtime and tips", categories: ["Final invoices, overtime and tips"] },
 ];

@@ -1,7 +1,8 @@
 import type { Payment } from "../payments.ts";
 import type { RateRow } from "../rates.ts";
+import type { BookingConfirmation, ContractCheck, Supplier } from "../protection.ts";
 
-// The approved-for-review example wedding from the spec (Porto, Saturday 26 June 2027), as of
+// The approved example wedding from the spec (Porto, Saturday 26 June 2027), as of
 // Sunday 18 October 2026. Rates are 1 EUR = £0.86 today and the mid-market rates on each day paid,
 // stored to 10 decimal places as the database does.
 export const TODAY = "2026-10-18";
@@ -26,21 +27,43 @@ const paid = (over: Parameters<typeof p>[0] & { paid_on: string; statement_minor
   p({ ...over, status: "paid", locked_home_minor: over.statement_minor, locked_home_currency: "GBP" });
 
 export const MUM = "m-mum";
+export const DESTINATION = "Porto, Portugal";
+export const WEDDING_DATE = "2027-06-26";
+
+export const SUPPLIERS: Supplier[] = [
+  { id: "s-quinta", name: "Quinta do Rio" }, { id: "s-sabores", name: "Sabores do Douro" }, { id: "s-bisi", name: "Bisi Events" },
+  { id: "s-luz", name: "Luz Studio" }, { id: "s-rita", name: "Rita Beauty" }, { id: "s-fado", name: "Fado Duo" },
+];
+const all3 = { payment_schedule: { state: "present" as const }, named_people: { state: "present" as const }, supplier_cancels: { state: "present" as const } };
+export const CONTRACT_CHECKS: ContractCheck[] = [
+  { supplier_id: "s-quinta", checked_at: "2026-06-10T10:00:00Z", clauses: {
+    payment_schedule: { state: "present" },
+    named_people: { state: "incomplete", evidence: "Names the coordinator but not who replaces her" },
+    supplier_cancels: { state: "missing" },
+  } },
+  { supplier_id: "s-sabores", checked_at: "2026-10-01T10:00:00Z", clauses: all3 },
+  { supplier_id: "s-bisi", checked_at: "2026-04-28T10:00:00Z", clauses: all3 },
+];
+export const BOOKINGS: BookingConfirmation[] = [
+  { supplier_id: "s-luz", arrive_at: "13:00", confirmed_on: "2026-08-18" },
+  { supplier_id: "s-rita", arrive_at: "08:30", confirmed_on: "2026-09-12" },
+  { supplier_id: "s-fado", arrive_at: null, confirmed_on: "2026-10-05" },
+];
 export const TUNDE = "m-tunde";
 
 export const PAYMENTS: Payment[] = [
-  paid({ title: "Planner – deposit 30%", amount_minor: 180000, category: "Wedding planner / coordinator", paid_on: "2026-05-02", statement_minor: 153200, method: "credit_card", protected: "yes" }),
-  paid({ title: "Venue hire – deposit 30%", amount_minor: 780000, category: "Venue hire", paid_on: "2026-06-15", statement_minor: 700000, method: "bank_transfer", protected: "no" }),
-  paid({ title: "Photographer – deposit 30%", amount_minor: 75000, category: "Photography", paid_on: "2026-08-20", statement_minor: 66100, method: "credit_card", protected: "yes", paying_member_id: TUNDE }),
-  paid({ title: "Hair and make-up – deposit", amount_minor: 20000, category: "Hair and make-up", paid_on: "2026-09-14", statement_minor: 17800, method: "bank_transfer" }),
-  p({ title: "Caterer – deposit 30%", amount_minor: 336000, category: "Catering", due_on: "2026-10-23", method: "credit_card", paying_member_id: MUM }),
-  p({ title: "Planner – second payment 40%", amount_minor: 240000, category: "Wedding planner / coordinator", due_on: "2026-12-26" }),
-  p({ title: "Venue hire – balance 70%", amount_minor: 1820000, category: "Venue hire", due_on: "2027-05-26", tax_included: false, tax_rate_bp: 2300 }),
-  p({ title: "Planner – final 30%", amount_minor: 180000, category: "Wedding planner / coordinator", due_on: "2027-05-26" }),
-  p({ title: "Photographer – balance", amount_minor: 175000, category: "Photography", due_on: "2027-05-26", paying_member_id: TUNDE }),
-  p({ title: "Caterer – balance after final numbers", amount_minor: 784000, category: "Catering", due_on: "2027-06-12", paying_member_id: MUM }),
-  p({ title: "Hair and make-up – balance", amount_minor: 90000, category: "Hair and make-up", due_on: "2027-06-26", method: "cash" }),
-  p({ title: "Musicians – ceremony", amount_minor: 50000, category: "Music, DJ and sound", due_on: "2027-06-26", method: "cash" }),
+  paid({ title: "Planner – deposit 30%", supplier_id: "s-bisi", amount_minor: 180000, category: "Wedding planner / coordinator", paid_on: "2026-05-02", statement_minor: 153200, method: "credit_card", protected: "yes" }),
+  paid({ title: "Venue hire – deposit 30%", supplier_id: "s-quinta", amount_minor: 780000, category: "Venue hire", paid_on: "2026-06-15", statement_minor: 700000, method: "bank_transfer", protected: "no", tax_included: false, tax_rate_bp: 2300 }),
+  paid({ title: "Photographer – deposit 30%", supplier_id: "s-luz", amount_minor: 75000, category: "Photography", paid_on: "2026-08-20", statement_minor: 66100, method: "credit_card", protected: "yes", paying_member_id: TUNDE }),
+  paid({ title: "Hair and make-up – deposit", supplier_id: "s-rita", amount_minor: 20000, category: "Hair and make-up", paid_on: "2026-09-14", statement_minor: 17800, method: "bank_transfer" }),
+  p({ title: "Caterer – deposit 30%", supplier_id: "s-sabores", amount_minor: 336000, category: "Catering", due_on: "2026-10-23", method: "credit_card", paying_member_id: MUM }),
+  p({ title: "Planner – second payment 40%", supplier_id: "s-bisi", amount_minor: 240000, category: "Wedding planner / coordinator", due_on: "2026-12-26" }),
+  p({ title: "Venue hire – balance 70%", supplier_id: "s-quinta", amount_minor: 1820000, category: "Venue hire", due_on: "2027-05-26", tax_included: false, tax_rate_bp: 2300 }),
+  p({ title: "Planner – final 30%", supplier_id: "s-bisi", amount_minor: 180000, category: "Wedding planner / coordinator", due_on: "2027-05-26" }),
+  p({ title: "Photographer – balance", supplier_id: "s-luz", amount_minor: 175000, category: "Photography", due_on: "2027-05-26", paying_member_id: TUNDE }),
+  p({ title: "Caterer – balance after final numbers", supplier_id: "s-sabores", amount_minor: 784000, category: "Catering", due_on: "2027-06-12", paying_member_id: MUM }),
+  p({ title: "Hair and make-up – balance", supplier_id: "s-rita", amount_minor: 90000, category: "Hair and make-up", due_on: "2027-06-26", method: "cash" }),
+  p({ title: "Musicians – ceremony", supplier_id: "s-fado", amount_minor: 50000, category: "Music, DJ and sound", due_on: "2027-06-26", method: "cash" }),
   p({ title: "Supplier food allowance", amount_minor: 30000, category: "Supplier food allowance", due_on: "2027-06-26", method: "cash" }),
   p({ title: "Tips for staff and drivers", amount_minor: 40000, category: "Final invoices, overtime and tips", due_on: "2027-06-26", method: "cash" }),
   p({ title: "DJ and sound – deposit", amount_minor: 42000, category: "Music, DJ and sound", due_on: "2026-11-01", is_estimate: true }),
