@@ -34,7 +34,7 @@ select pg_temp.act_as('magali'); select public.accept_invite(current_setting('t.
 select pg_temp.act_as('mum'); select public.accept_invite(current_setting('t.mum')); reset role;
 
 select pg_temp.act_as('ade');
-select set_config('t.mum_id', (select id::text from public.members where display_name = 'Mum'), true);
+select set_config('t.mum_id', (select id::text from public.members where display_name = 'Mum' and wedding_id = current_setting('t.wid')::uuid), true);
 insert into public.payments (wedding_id, title, amount_minor, currency, due_on, paying_member_id) values
   (current_setting('t.wid')::uuid, 'Caterer – deposit', 336000, 'GBP', '2026-10-21', current_setting('t.mum_id')::uuid), -- 3 days
   (current_setting('t.wid')::uuid, 'Planner – second payment', 240000, 'GBP', '2026-10-28', null),                         -- 10 days
@@ -43,32 +43,34 @@ insert into public.payments (wedding_id, title, amount_minor, currency, due_on, 
 insert into public.payments (wedding_id, title, amount_minor, currency, due_on, is_estimate, due_offset_days) values
   (current_setting('t.wid')::uuid, 'DJ (estimate)', 42000, 'GBP', '2026-10-20', true, 250);                                -- estimates: no reminder
 do $$ begin
-  assert (select email_reminders from public.members where display_name = 'Ade'), 'the owner gets reminders by default';
-  assert (select not email_reminders from public.members where display_name = 'Magali'), 'the planner chooses';
+  assert (select email_reminders from public.members where display_name = 'Ade' and wedding_id = current_setting('t.wid')::uuid), 'the owner gets reminders by default';
+  assert (select email_reminders from public.members where display_name = 'Magali' and wedding_id = current_setting('t.wid')::uuid), 'the planner gets reminders by default';
+  assert (select email_reminders from public.members where display_name = 'Mum' and wedding_id = current_setting('t.wid')::uuid), 'family get reminders by default (for what they cover)';
 end $$;
 select pg_temp.expect_error($$select public.reminders_to_send('2026-10-18')$$, '42501', 'only the server can list reminders');
 reset role;
 
 select pg_temp.act_as('mum');
-select pg_temp.expect_error($$select public.set_my_emails(current_setting('t.wid')::uuid, true, false)$$, 'family_emails_off', 'family emails stay off for now');
+select pg_temp.expect_error($$select public.set_my_emails(current_setting('t.wid')::uuid, true, true)$$, 'family_weekly_off', 'family get no weekly summary');
+select public.set_my_emails(current_setting('t.wid')::uuid, true, false);
 reset role;
 select pg_temp.act_as('magali');
 select public.set_my_emails(current_setting('t.wid')::uuid, true, true);
 reset role;
 
 do $$ declare r record; begin
-  assert (select count(*) from public.reminders_to_send('2026-10-18') where wedding_id = current_setting('t.wid')::uuid) = 4,
-    'two payments each for Ade and Magali (3 and 10 days); nothing 33 days out, overdue or estimated';
+  assert (select count(*) from public.reminders_to_send('2026-10-18') where wedding_id = current_setting('t.wid')::uuid) = 5,
+    'two payments each for Ade and Magali (3 and 10 days), and Mum''s one; nothing 33 days out, overdue or estimated';
   select * into r from public.reminders_to_send('2026-10-18') where wedding_id = current_setting('t.wid')::uuid and title = 'Caterer – deposit' limit 1;
   assert r.kind = 'due_3' and r.days_left = 3 and r.payer_name = 'Mum', 'the caterer is the 3-day reminder, Mum paying';
   assert (select kind from public.reminders_to_send('2026-10-18') where wedding_id = current_setting('t.wid')::uuid and title like 'Planner%' limit 1) = 'due_14', 'the planner payment is the 14-day reminder';
-  assert not exists (select 1 from public.reminders_to_send('2026-10-18') where display_name = 'Mum'), 'no emails to family';
+  assert (select array_agg(title) from public.reminders_to_send('2026-10-18') where wedding_id = current_setting('t.wid')::uuid and display_name = 'Mum') = array['Caterer – deposit'], 'family hear only about what they cover';
   -- Once sent and logged, they don't go again.
   insert into public.alert_log (wedding_id, member_id, payment_id, kind, sent_for)
   select wedding_id, member_id, payment_id, kind, due_on from public.reminders_to_send('2026-10-18') where wedding_id = current_setting('t.wid')::uuid;
   assert (select count(*) from public.reminders_to_send('2026-10-19') where wedding_id = current_setting('t.wid')::uuid) = 0, 'nothing twice the next day';
   -- The planner payment reaches 3 days on 25 October and gets its second reminder.
-  assert (select count(*) from public.reminders_to_send('2026-10-25') where wedding_id = current_setting('t.wid')::uuid and kind = 'due_3') = 2, 'the 3-day reminder follows';
+  assert (select count(*) from public.reminders_to_send('2026-10-25') where wedding_id = current_setting('t.wid')::uuid and kind = 'due_3') = 2, 'the 3-day reminder follows (the planner payment, not Mum''s)';
   -- Sunday is the default check-in day: only Magali asked for the summary.
   assert (select count(*) from public.summaries_to_send('2026-10-18') where wedding_id = current_setting('t.wid')::uuid) = 1, 'one weekly summary, for Magali';
   assert (select jsonb_array_length(due_soon) from public.summaries_to_send('2026-10-18') where wedding_id = current_setting('t.wid')::uuid) = 2, 'two due in the next fortnight';
