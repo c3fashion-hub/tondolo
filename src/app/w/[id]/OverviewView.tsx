@@ -19,8 +19,8 @@ export type OverviewProps = {
 
 const SOON_DAYS = 14;
 
-// The couple's and planner's Overview: days to go, totals, what needs attention, the health check
-// and a one-line summary linking to Budget. Before the first payment it's the First open screen.
+// The couple's and planner's Overview: days to go, totals, what needs attention, a one-line summary
+// linking to Budget and the health check, in the design's order. Before the first payment it's the First open screen.
 export function OverviewView(props: OverviewProps) {
   const { weddingId, home, today, payments, weddingDate } = props;
   const base = `/w/${weddingId}`;
@@ -109,6 +109,13 @@ export function OverviewView(props: OverviewProps) {
         {rows.length ? rows : <p className="tn-muted" style={{ margin: "8px 0 0" }}>Nothing needs you in the next two weeks.</p>}
       </section>
 
+      <Link href={`${base}/budget`} className={`${styles.card} ${styles.summary}`}>
+        <span className={styles.cardText}>
+          <b>{budget ? `${money(t.committed)} of ${money(budget)} committed` : `${money(t.committed)} committed`}</b>
+          {extra ? <span>{extra}</span> : null}
+        </span>
+        <span className={styles.cardLink}>See budget</span>
+      </Link>
       <Link href={`${base}/health`} className={styles.card}>
         <HealthRing score={health.score} />
         <span className={styles.cardText}>
@@ -119,13 +126,6 @@ export function OverviewView(props: OverviewProps) {
         </span>
       </Link>
 
-      <Link href={`${base}/budget`} className={`${styles.card} ${styles.summary}`}>
-        <span className={styles.cardText}>
-          <b>{budget ? `${money(t.committed)} of ${money(budget)} committed` : `${money(t.committed)} committed`}</b>
-          {extra ? <span>{extra}</span> : null}
-        </span>
-        <span className={styles.cardLink}>See budget</span>
-      </Link>
     </>
   );
 }
