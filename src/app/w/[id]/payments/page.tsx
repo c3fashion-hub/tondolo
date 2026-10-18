@@ -1,8 +1,26 @@
 import type { Metadata } from "next";
-import { ComingSoon } from "@/components/ComingSoon";
+import { loadMoney } from "@/lib/money-data.ts";
+import { can } from "@/lib/roles.ts";
+import { todayIn } from "@/lib/dates.ts";
+import { PaymentsView } from "./PaymentsView";
 
 export const metadata: Metadata = { title: "Payments" };
 
-export default function PaymentsPage() {
-  return <ComingSoon title="Payments" what="Soon you'll add each deposit and balance here, in the currency the supplier charges, or scan the quote and check what we found." />;
+export default async function PaymentsPage({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params;
+  const data = await loadMoney(id);
+  return (
+    <PaymentsView
+      weddingId={id}
+      home={data.wedding.home_currency}
+      unlocked={data.wedding.unlocked_at !== null}
+      payments={data.payments}
+      people={data.people}
+      suppliers={data.suppliers}
+      rates={data.rates}
+      me={{ id: data.me.id, role: data.me.role }}
+      seeAll={can(data.me.role).seeAllPayments}
+      today={todayIn()}
+    />
+  );
 }

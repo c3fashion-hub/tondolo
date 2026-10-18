@@ -7,6 +7,7 @@ import { buttonClass } from "@/components/ui";
 import { supabaseBrowser } from "@/lib/supabase/client.ts";
 import { clearSetupDraft, loadSetupDraft } from "@/lib/setup-draft.ts";
 import { firstNameFrom } from "@/lib/roles.ts";
+import { buildStarter } from "@/lib/starter.ts";
 
 type State = "saving" | "no-draft" | "error";
 
@@ -35,8 +36,26 @@ export function FinishSetup() {
         p_display_name: firstNameFrom(draft.names, user.email ?? ""),
       });
       if (error || !data) { setState("error"); return; }
+      const weddingId = data as string;
+      // Load the standard budget once (a retry won't add it twice).
+      const { count } = await supabase.from("budgets").select("category", { count: "exact", head: true }).eq("wedding_id", weddingId);
+      if (!count) {
+        const d = new Date();
+        const today = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+        const starter = draft.useStarterBudget
+          ? buildStarter(draft.roughBudgetMinor, draft.homeCurrency, draft.weddingDate, today)
+          : { budgets: [], payments: [] };
+        if (starter.budgets.length) {
+          const b = await supabase.from("budgets").insert(starter.budgets.map((x) => ({ ...x, wedding_id: weddingId })));
+          if (b.error) { setState("error"); return; }
+        }
+        if (starter.payments.length) {
+          const p = await supabase.from("payments").insert(starter.payments.map((x) => ({ ...x, wedding_id: weddingId })));
+          if (p.error) { setState("error"); return; }
+        }
+      }
       clearSetupDraft();
-      router.replace(`/w/${data}`);
+      router.replace(`/w/${weddingId}`);
     })();
   }, [router]);
 

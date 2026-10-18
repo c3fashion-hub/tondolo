@@ -54,3 +54,8 @@ test("a wedding page needs signing in", async ({ page }) => {
   await page.goto("/w/00000000-0000-4000-8000-000000000000");
   await expect(page).toHaveURL("/sign-in");
 });
+
+test("the local preview page isn't served on the live site", async ({ page }) => {
+  const res = await page.goto("/dev/money");
+  expect(res?.status()).toBe(404);
+});

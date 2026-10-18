@@ -35,3 +35,26 @@ test("formats minor units for display", () => {
   assert.equal(formatMinor(336_000, "EUR"), "€3,360");
   assert.equal(formatMinor(850_000, "XOF"), "F CFA 850,000".replace(/.*?(850,000)/, (m) => m) );
 });
+
+import { parsePercentToBp, minorToInput } from "../../src/lib/money.ts";
+import { supplierNameFrom } from "../../src/lib/suppliers.ts";
+
+test("reads tax rates as basis points", () => {
+  assert.equal(parsePercentToBp("23"), 2300);
+  assert.equal(parsePercentToBp("23.5%"), 2350);
+  assert.equal(parsePercentToBp("0"), 0);
+  assert.equal(parsePercentToBp("101"), null);
+  assert.equal(parsePercentToBp("abc"), null);
+});
+
+test("turns stored amounts back into what you'd type", () => {
+  assert.equal(minorToInput(125_050, "GBP"), "1,250.50");
+  assert.equal(minorToInput(336_000, "EUR"), "3,360.00");
+  assert.equal(minorToInput(850_000, "XOF"), "850,000");
+});
+
+test("finds the supplier in a payment title", () => {
+  assert.equal(supplierNameFrom("Quinta do Rio – deposit 30%"), "Quinta do Rio");
+  assert.equal(supplierNameFrom("Florist - balance"), "Florist");
+  assert.equal(supplierNameFrom("Supplier food allowance"), "Supplier food allowance");
+});

@@ -104,6 +104,7 @@ do $$ begin
   assert pg_temp.rows($q$update public.payments set amount_minor = 1 where title = 'Venue hire – balance'$q$) = 0, 'Mum cannot edit the couple''s payment';
   assert pg_temp.rows($q$delete from public.payments where title = 'Venue hire – balance'$q$) = 0, 'Mum cannot delete the couple''s payment';
   assert pg_temp.rows($q$update public.weddings set destination = 'Lisbon'$q$) = 0, 'Mum cannot change settings';
+  assert (select committed from public.wedding_progress(current_setting('t.wid')::uuid)) > 0, 'Mum sees overall progress';
 end $$;
 select pg_temp.expect_error($$update public.payments set paying_member_id = current_setting('t.tunde_id')::uuid where title = 'Caterer – deposit'$$, '42501', 'Mum cannot hand her payment to someone else');
 select pg_temp.expect_error($$insert into public.payments (wedding_id, title, amount_minor, currency, paying_member_id) values (current_setting('t.wid')::uuid, 'Sneaky', 100, 'EUR', current_setting('t.tunde_id')::uuid)$$, '42501', 'Mum cannot add a payment for someone else');
@@ -141,6 +142,7 @@ do $$ begin
   assert (select count(*) from public.weddings) = 0, 'removed person sees no wedding';
   assert (select count(*) from public.payments) = 0, 'removed person sees no payments';
 end $$;
+select pg_temp.expect_error($$select * from public.wedding_progress(current_setting('t.wid')::uuid)$$, 'not_allowed', 'removed person sees no progress');
 reset role;
 
 -- Only the owner can delete the wedding, and everything goes with it.

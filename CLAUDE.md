@@ -59,6 +59,9 @@ Prices, refunds and what's included; legal wording; tax; going live with Stripe;
 - `npm run typecheck`, `npm test` (unit, Node's built-in runner), `npm run test:e2e` (Playwright, uses /opt/pw-browsers Chromium)
 - `npm run build`: production build (what Netlify runs)
 - Database: migrations in `supabase/migrations` (apply in order); role tests in `supabase/tests/roles_test.sql` (run in the SQL editor; it rolls back and ends with ALL ROLE TESTS PASSED)
+- Money tests: `supabase/tests/money_test.sql` (conversion, rate locking, statement amounts, free limit, budgets; ends with ALL MONEY TESTS PASSED). The same conversion cases are in `tests/unit/rates-starter.test.ts`, so the app and database round identically.
+- Rates: `supabase/functions/rates-daily` runs at 06:10 UTC via pg_cron (ExchangeRate-API open access, free, attribution shown next to converted amounts).
+- Local preview of money screens with the example wedding: `TONDOLO_PREVIEW=1 npm start`, then `/dev/money` and `/dev/money?screen=budget` (404 on the live site).
 - `npm run test:live`: sharing flow against the real Supabase project with temporary test people (needs E2E_PASSWORD and network access to *.supabase.co)
 
 ## Sharing
