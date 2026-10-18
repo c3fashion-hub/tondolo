@@ -20,7 +20,7 @@ test("a payment due in 3 days gets a clear reminder email", () => {
 });
 
 test("several payments go in one email, soonest first, and names are escaped in HTML", () => {
-  const e = reminderEmail({ displayName: "Bisi", names: "Ade & Sam", ...links, items: [
+  const e = reminderEmail({ displayName: "Magali", names: "Ade & Sam", ...links, items: [
     { ...caterer, title: "Planner – second payment 40%", due_on: "2026-11-01", days_left: 14, supplier_name: null, payer_name: null },
     { ...caterer, title: "Cake <special>", days_left: 0, due_on: "2026-10-18" },
   ] });

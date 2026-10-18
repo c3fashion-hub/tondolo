@@ -63,7 +63,7 @@ test("the owner invites a partner, family member and planner", async ({ browser,
 
   partnerLink = await invite("Sam", "e2e-partner@example.com", "Partner");
   mumLink = await invite("Mum", "e2e-mum@example.com", "Family");
-  plannerLink = await invite("Bisi", "e2e-planner-not-a-user@example.com", "Planner");
+  plannerLink = await invite("Magali", "e2e-planner-not-a-user@example.com", "Planner");
   await expect(page.getByText("Invited")).toHaveCount(3);
   if (SHOTS) await page.screenshot({ path: `${SHOTS}/settings.png`, fullPage: true });
 });

@@ -4,12 +4,12 @@ begin;
 
 insert into auth.users (id, instance_id, aud, role, email) values
   ('00000000-0000-4000-8000-0000000000c1', '00000000-0000-0000-0000-000000000000', 'authenticated', 'authenticated', 'ade@example.test'),
-  ('00000000-0000-4000-8000-0000000000c3', '00000000-0000-0000-0000-000000000000', 'authenticated', 'authenticated', 'bisi@example.test'),
+  ('00000000-0000-4000-8000-0000000000c3', '00000000-0000-0000-0000-000000000000', 'authenticated', 'authenticated', 'magali@example.test'),
   ('00000000-0000-4000-8000-0000000000c4', '00000000-0000-0000-0000-000000000000', 'authenticated', 'authenticated', 'mum@example.test'),
   ('00000000-0000-4000-8000-0000000000c6', '00000000-0000-0000-0000-000000000000', 'authenticated', 'authenticated', 'stranger@example.test');
 
 create function pg_temp.act_as(who text) returns void language plpgsql as $$
-declare ids jsonb := '{"ade":"c1","bisi":"c3","mum":"c4","stranger":"c6"}';
+declare ids jsonb := '{"ade":"c1","magali":"c3","mum":"c4","stranger":"c6"}';
 begin
   perform set_config('request.jwt.claims', json_build_object('sub', '00000000-0000-4000-8000-0000000000' || (ids ->> who), 'role', 'authenticated')::text, true);
   perform set_config('role', 'authenticated', true);
@@ -28,10 +28,10 @@ end $$;
 
 select pg_temp.act_as('ade');
 select set_config('t.wid', public.create_wedding('GBP', '2027-06-26', 'Porto, Portugal', 'Ade & Sam', 5800000, true, 'Ade')::text, true);
-select set_config('t.bisi', public.invite_member(current_setting('t.wid')::uuid, 'planner', 'Bisi', 'bisi@example.test'), true);
+select set_config('t.magali', public.invite_member(current_setting('t.wid')::uuid, 'planner', 'Magali', 'magali@example.test'), true);
 select set_config('t.mum', public.invite_member(current_setting('t.wid')::uuid, 'family', 'Mum', 'mum@example.test', 'GBP'), true);
 reset role;
-select pg_temp.act_as('bisi'); select public.accept_invite(current_setting('t.bisi')); reset role;
+select pg_temp.act_as('magali'); select public.accept_invite(current_setting('t.magali')); reset role;
 select pg_temp.act_as('mum'); select public.accept_invite(current_setting('t.mum')); reset role;
 
 -- Ade uploads two documents; their paths must sit in the wedding's own folder.
@@ -58,7 +58,7 @@ reset role;
 -- The server gives a read back when reading failed on its side.
 select public.release_document_read(current_setting('t.u1')::uuid);
 update public.weddings set unlocked_at = now() where id = current_setting('t.wid')::uuid; -- as checkout will (stage 9)
-select pg_temp.act_as('bisi');
+select pg_temp.act_as('magali');
 do $$ begin
   assert public.document_reads_left(current_setting('t.wid')::uuid) = 100, 'unlocked: 100 reads';
   assert public.claim_document_read(current_setting('t.wid')::uuid, current_setting('t.d2')::uuid, 'contract_check') is not null, 'the planner can read documents';

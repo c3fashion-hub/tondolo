@@ -21,7 +21,7 @@ test("the cash plan matches the on-the-day payments: €2,100, withdraw by Thu 2
   assert.equal(plan.days.length, 1);
   assert.deepEqual(plan.days[0].envelopes.map((e) => [e.payment.title, e.payment.amount_minor, e.when, e.payment.handover_by]), [
     ["Hair and make-up – balance", 90_000, "09:00", "Sam's sister"],
-    ["Supplier food allowance", 30_000, "13:00", "Bisi"],
+    ["Supplier food allowance", 30_000, "13:00", "Magali"],
     ["Musicians – ceremony", 50_000, "16:30, after the ceremony", "Best man"],
     ["Tips for staff and drivers", 40_000, "End of the night", "Best man"],
   ]);

@@ -4,7 +4,7 @@ begin;
 
 insert into auth.users (id, instance_id, aud, role, email) values
   ('00000000-0000-4000-8000-0000000000b1', '00000000-0000-0000-0000-000000000000', 'authenticated', 'authenticated', 'ade@example.test'),
-  ('00000000-0000-4000-8000-0000000000b3', '00000000-0000-0000-0000-000000000000', 'authenticated', 'authenticated', 'bisi@example.test'),
+  ('00000000-0000-4000-8000-0000000000b3', '00000000-0000-0000-0000-000000000000', 'authenticated', 'authenticated', 'magali@example.test'),
   ('00000000-0000-4000-8000-0000000000b4', '00000000-0000-0000-0000-000000000000', 'authenticated', 'authenticated', 'mum@example.test');
 
 -- Made-up rates: a month ago 1 GBP = 1.25 EUR; today 1.20. XOF 780 and MAD missing until later.
@@ -12,7 +12,7 @@ insert into public.rates (on_date, currency, per_gbp, source) values
   (current_date - 30, 'EUR', 1.25, 'test'), (current_date, 'EUR', 1.20, 'test'), (current_date - 30, 'XOF', 780, 'test');
 
 create function pg_temp.act_as(who text) returns void language plpgsql as $$
-declare ids jsonb := '{"ade":"b1","bisi":"b3","mum":"b4"}';
+declare ids jsonb := '{"ade":"b1","magali":"b3","mum":"b4"}';
 begin
   perform set_config('request.jwt.claims', json_build_object('sub', '00000000-0000-4000-8000-0000000000' || (ids ->> who), 'role', 'authenticated')::text, true);
   perform set_config('role', 'authenticated', true);
@@ -45,10 +45,10 @@ end $$;
 
 select pg_temp.act_as('ade');
 select set_config('t.wid', public.create_wedding('GBP', (current_date + 250)::date, 'Porto, Portugal', 'Ade & Sam', 5000000, true, 'Ade')::text, true);
-select set_config('t.bisi', public.invite_member(current_setting('t.wid')::uuid, 'planner', 'Bisi', 'bisi@example.test'), true);
+select set_config('t.magali', public.invite_member(current_setting('t.wid')::uuid, 'planner', 'Magali', 'magali@example.test'), true);
 select set_config('t.mum', public.invite_member(current_setting('t.wid')::uuid, 'family', 'Mum', 'mum@example.test', 'GBP'), true);
 reset role;
-select pg_temp.act_as('bisi'); select public.accept_invite(current_setting('t.bisi')); reset role;
+select pg_temp.act_as('magali'); select public.accept_invite(current_setting('t.magali')); reset role;
 select pg_temp.act_as('mum');  select public.accept_invite(current_setting('t.mum'));  reset role;
 
 -- A paid amount locks at the rate on the day paid and keeps it when rates move.
@@ -122,7 +122,7 @@ end $$;
 -- Budgets: the couple and planner can set them; family can't see them.
 insert into public.budgets (wedding_id, category, amount_minor) values (current_setting('t.wid')::uuid, 'Venue hire', 500000);
 reset role;
-select pg_temp.act_as('bisi');
+select pg_temp.act_as('magali');
 do $$ begin assert (select count(*) from public.budgets) = 1, 'planner sees the budget'; end $$;
 update public.budgets set amount_minor = 520000 where category = 'Venue hire';
 reset role;

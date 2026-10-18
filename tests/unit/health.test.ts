@@ -56,7 +56,7 @@ test("going well: £2,371 of £9,371 paid is covered, £7,000 at risk", () => {
 
 test("protection levels per supplier match the spec", () => {
   const levels = Object.fromEntries(SUPPLIERS.map((s) => [s.name, supplier(s.name).level]));
-  assert.deepEqual(levels, { "Quinta do Rio": 1, "Sabores do Douro": 1, "Bisi Events": 1, "Luz Studio": 2, "Rita Beauty": 3, "Fado Duo": 3 });
+  assert.deepEqual(levels, { "Quinta do Rio": 1, "Sabores do Douro": 1, "Magali Events": 1, "Luz Studio": 2, "Rita Beauty": 3, "Fado Duo": 3 });
   assert.equal(supplier("Quinta do Rio").committed, 2_265_200);
   assert.equal(supplier("Luz Studio").committed, 216_600);
   assert.equal(supplier("Rita Beauty").committed, 95_200);
@@ -81,9 +81,9 @@ test("money at risk counts paid money once and never money not yet paid", () => 
   // Quinta's balance (€18,200) is unpaid: not at risk, however weak the contract.
   assert.equal(supplier("Quinta do Rio").atRisk, 700_000);
   // A card payment with protected = yes is covered even with no contract checked.
-  const bisiNoCheck = protectionFor(SUPPLIERS[2], PAYMENTS, [], BOOKINGS, WEDDING_DATE, "GBP", book, TODAY);
-  assert.equal(bisiNoCheck.inPlace, false);
-  assert.equal(bisiNoCheck.atRisk, 0);
+  const magaliNoCheck = protectionFor(SUPPLIERS[2], PAYMENTS, [], BOOKINGS, WEDDING_DATE, "GBP", book, TODAY);
+  assert.equal(magaliNoCheck.inPlace, false);
+  assert.equal(magaliNoCheck.atRisk, 0);
   // Fixing the Quinta's contract covers its bank transfer too.
   const fixed = CONTRACT_CHECKS.map((c) => c.supplier_id === "s-quinta" ? { ...c, clauses: CONTRACT_CHECKS[1].clauses } : c);
   const h = healthCheck({ ...example, checks: fixed })!;
