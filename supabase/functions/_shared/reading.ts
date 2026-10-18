@@ -2,19 +2,8 @@
 // must answer in (structured outputs). Shared by the read-document function and the app's tests.
 // Plain TypeScript with no imports, so it runs in both Deno and Node.
 
-// The budget lines a payment can belong to; must match src/lib/categories.ts (a unit test checks).
-export const CATEGORY_NAMES = [
-  "Wedding planner / coordinator", "Site visit and tasting trips", "Wedding insurance", "Currency, card and bank fees",
-  "Local taxes and tourist tax", "Contingency", "Legal paperwork, apostilles and translations", "Officiant / celebrant",
-  "Venue hire", "Venue extras: permits, generator, security, cleaning, toilets", "Catering", "Bar and drinks", "Cake and desserts",
-  "Photography", "Videography", "Music, DJ and sound", "Hair and make-up", "Florals and décor", "Furniture and rentals",
-  "Stationery and signage", "Supplier flights", "Supplier transfers: home to airport and back, both ends",
-  "Supplier transfers: airport to accommodation and back", "Supplier transfers: accommodation to venue, each working day",
-  "Supplier accommodation", "Supplier food allowance", "Welcome party", "Farewell brunch", "Guest transport and transfers",
-  "Welcome bags and favours", "Childcare", "Wedding dress and alterations", "Suit and alterations",
-  "Shoes, accessories and cultural outfits", "Your flights and transfers", "Your accommodation", "Excess baggage and shipping",
-  "Final invoices, overtime and tips", "Dress cleaning and shipping home",
-];
+export { CATEGORY_NAMES } from "./categories.ts";
+import { CATEGORY_NAMES } from "./categories.ts";
 
 export const MUST_HAVE_KEYS = ["payment_schedule", "named_people", "supplier_cancels"] as const;
 export const RECOMMENDED_KEYS = ["who", "what", "price_currency", "you_cancel", "force_majeure", "third_parties", "changes_language"] as const;

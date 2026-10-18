@@ -10,18 +10,8 @@ export type DueItem = {
 
 export type Email = { subject: string; text: string; html: string };
 
-// Money from minor units with exact decimal strings, never floating point.
-export function money(minor: number, code: string, digits: number, whole = false): string {
-  const scale = 10 ** digits;
-  let m = Math.abs(minor);
-  if (whole && digits) m = Math.floor((m + scale / 2) / scale) * scale;
-  const frac = m % scale;
-  const showFrac = digits > 0 && frac !== 0;
-  const exact = `${Math.floor(m / scale)}${showFrac ? `.${String(frac).padStart(digits, "0")}` : ""}`;
-  const text = new Intl.NumberFormat("en-GB", { style: "currency", currency: code, minimumFractionDigits: showFrac ? digits : 0, maximumFractionDigits: showFrac ? digits : 0 })
-    .format(exact as unknown as number);
-  return minor < 0 ? `-${text}` : text;
-}
+export { money } from "./money.ts";
+import { money } from "./money.ts";
 
 function parse(iso: string) { const [y, m, d] = iso.split("-").map(Number); return new Date(Date.UTC(y, m - 1, d)); }
 export const longDate = (iso: string) => parse(iso).toLocaleDateString("en-GB", { weekday: "long", day: "numeric", month: "long", timeZone: "UTC" });

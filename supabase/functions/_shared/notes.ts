@@ -1,8 +1,8 @@
 // What the AI is asked to do with a voice note or a question, the exact shape it must answer in
 // (structured outputs), and the checks on what comes back. Shared by the read-note and
-// ask-question functions and the app's tests. Plain TypeScript; its only import has no imports.
-import { CATEGORY_NAMES } from "./reading.ts";
-import { money } from "./emails.ts";
+// ask-question functions and the app's tests. Plain TypeScript; its imports have no imports.
+import { CATEGORY_NAMES } from "./categories.ts";
+import { money } from "./money.ts";
 
 const str = { type: "string" };
 const nullable = (s: object) => ({ anyOf: [s, { type: "null" }] });
