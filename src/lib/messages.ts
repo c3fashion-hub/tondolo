@@ -5,8 +5,8 @@ import type { Language } from "./protection.ts";
 // Tondolo never sends anything on their behalf.
 //
 // The booking message is the Protection Kit's six points. English and French are the Kit's own
-// templates, word for word (Mags checks the French). Portuguese and Spanish are Claude's drafts,
-// to be proofread before launch. The receipt request is drafted in all four.
+// templates, word for word (Mags checks the French). Portuguese and Spanish are Claude's
+// translations, approved by Mags as they are (18 October 2026). The receipt request is in all four.
 
 export const LANGUAGES: { code: Language; label: string; locale: string }[] = [
   { code: "en", label: "English", locale: "en-GB" },
@@ -61,13 +61,13 @@ const BOOKING: Record<Language, { hello: (name: string) => string; labels: Recor
     cantCome: "En cas d'empêchement : vous nous enverrez un remplaçant que nous aurons validé, ou vous nous rembourserez l'acompte.",
     close: "Un simple « Confirmé » nous suffit. Merci beaucoup !",
   },
-  pt: { // draft, to be proofread
+  pt: { // Claude's translation, approved by Mags as it is
     hello: (n) => `Olá ${n}, estamos muito felizes por contar consigo no nosso casamento! Para que fique tudo claro, pode responder a confirmar estes detalhes?`,
     labels: { who: "Quem", what: "Serviço", whenWhere: "Data e local", arrival: "Hora de chegada e tudo pronto às", price: "Preço" },
     cantCome: "Se não puder vir: envia um substituto aprovado por nós, ou devolve o nosso sinal.",
     close: "Basta um simples «Confirmado». Muito obrigado!",
   },
-  es: { // draft, to be proofread
+  es: { // Claude's translation, approved by Mags as it is
     hello: (n) => `¡Hola ${n}! Estamos encantados de contar contigo para nuestra boda. Para que todo quede claro, ¿podrías responder confirmando estos detalles?`,
     labels: { who: "Quién", what: "Servicio", whenWhere: "Fecha y lugar", arrival: "Hora de llegada y todo listo a las", price: "Precio" },
     cantCome: "Si no puedes venir: enviarás un sustituto que hayamos aprobado o nos devolverás la señal.",
