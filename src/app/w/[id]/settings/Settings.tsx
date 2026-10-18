@@ -11,11 +11,20 @@ import type { Member, Wedding } from "@/lib/wedding.ts";
 import { InviteSheet } from "./InviteSheet";
 import { MemberSheet } from "./MemberSheet";
 import { WeddingSheet } from "./WeddingSheet";
+import { CheckinSheet } from "./CheckinSheet";
+import { EmailChoices } from "./EmailChoices";
+import { CalendarLinks } from "@/components/calendar/CalendarLinks";
+import { checkinLabel, checkinSlots, googleCheckinLink, type Checkin } from "@/lib/calendar.ts";
 import styles from "./settings.module.css";
 
-export function Settings({ wedding, me, members, myEmail, rights }: { wedding: Wedding; me: Member; members: Member[]; myEmail: string; rights: Can }) {
+export type MyEmails = { reminders: boolean; weekly: boolean };
+
+export function Settings({ wedding, me, members, myEmail, rights, checkin, emails, today, preview }: {
+  wedding: Wedding; me: Member; members: Member[]; myEmail: string; rights: Can;
+  checkin: Checkin | null; emails: MyEmails; today: string; preview?: boolean;
+}) {
   const router = useRouter();
-  const [sheet, setSheet] = useState<{ kind: "invite" } | { kind: "member"; member: Member } | { kind: "wedding" } | null>(null);
+  const [sheet, setSheet] = useState<{ kind: "invite" } | { kind: "member"; member: Member } | { kind: "wedding" } | { kind: "checkin" } | null>(null);
   const close = () => setSheet(null);
   const done = () => { setSheet(null); router.refresh(); };
   const cur = currency(wedding.home_currency);
@@ -60,8 +69,23 @@ export function Settings({ wedding, me, members, myEmail, rights }: { wedding: W
           <div className={styles.row}><span>{formatLongDate(wedding.wedding_date)} · {wedding.destination}</span></div>
           {wedding.names ? <div className={styles.row}><span>{wedding.names}</span></div> : null}
           <div className={styles.row}><span>Totals shown in {cur ? `${cur.name} (${cur.code})` : wedding.home_currency}</span></div>
+          {me.role !== "family" ? (
+            <div id="checkin" className={`${styles.row} ${styles.rowEdit}`}>
+              <span>Weekly check-in · {checkin ? checkinLabel(checkin) : "not set yet"}</span>
+              {rights.editSettings ? <Button variant="link" size="sm" onClick={() => setSheet({ kind: "checkin" })} aria-label="Change the weekly check-in">{checkin ? "Edit" : "Pick a time"}</Button> : null}
+            </div>
+          ) : null}
         </div>
+        {checkin && me.role !== "family" ? (
+          <CalendarLinks label="Add the check-in to your calendar" ics={`/w/${wedding.id}/calendar/checkin`}
+            google={checkinSlots(checkin, today, wedding.wedding_date).map((slot) => googleCheckinLink(checkin, slot, wedding.id, wedding.names))} />
+        ) : null}
         {rights.editSettings ? <Button variant="secondary" block onClick={() => setSheet({ kind: "wedding" })}>Edit your wedding</Button> : null}
+      </section>
+
+      <section className={styles.section} aria-labelledby="emails-h">
+        <h2 id="emails-h" className="tn-heading">Your emails</h2>
+        <EmailChoices weddingId={wedding.id} email={myEmail} reminders={emails.reminders} weekly={emails.weekly} family={me.role === "family"} preview={preview} />
       </section>
 
       <p className={styles.notice}><b>Please check your information.</b> Tondolo reads documents, converts currencies and suggests actions automatically, and technology can get things wrong. Always check amounts, dates and details against your contracts, invoices and bank statements.</p>
@@ -73,6 +97,7 @@ export function Settings({ wedding, me, members, myEmail, rights }: { wedding: W
 
       <InviteSheet open={sheet?.kind === "invite"} weddingId={wedding.id} members={members} onClose={close} onInvited={() => router.refresh()} />
       <MemberSheet member={sheet?.kind === "member" ? sheet.member : null} members={members} onClose={close} onDone={done} />
+      {sheet?.kind === "checkin" ? <CheckinSheet open weddingId={wedding.id} checkin={checkin} onClose={close} onDone={done} /> : null}
       <WeddingSheet open={sheet?.kind === "wedding"} wedding={wedding} onClose={close} onDone={done} />
     </>
   );

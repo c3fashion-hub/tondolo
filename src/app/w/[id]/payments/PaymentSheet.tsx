@@ -12,6 +12,8 @@ import { supplierNameFrom } from "@/lib/suppliers.ts";
 import { METHOD_LABEL, type Method, type Payment } from "@/lib/payments.ts";
 import type { RateBook } from "@/lib/rates.ts";
 import type { ViewProps } from "./PaymentsView";
+import { CalendarLinks } from "@/components/calendar/CalendarLinks";
+import { googlePaymentLink } from "@/lib/calendar.ts";
 import styles from "./payments.module.css";
 
 type Props = ViewProps & { book: RateBook; payment: Payment | "new" | null; onClose: () => void; onDone: () => void };
@@ -226,6 +228,10 @@ export function PaymentSheet({ weddingId, home, people, me, book, today, payment
             </div>
           </details>
 
+          {existing && !existing.is_estimate && existing.status === "due" && existing.due_on ? (
+            <CalendarLinks ics={`/w/${weddingId}/calendar/payments?payment=${existing.id}`}
+              google={googlePaymentLink({ id: existing.id, title: existing.title, amountText: formatMinor(existing.amount_minor, existing.currency), due_on: existing.due_on }, weddingId)} />
+          ) : null}
           {errors.form ? <p className="tn-alert" role="alert">{errors.form}</p> : null}
           <Button type="submit" block disabled={busy}>{busy ? "Saving…" : "Save payment"}</Button>
           {existing ? <Button variant="secondary" block onClick={() => setConfirmDelete(true)}>Delete payment</Button> : null}

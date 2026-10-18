@@ -123,6 +123,9 @@ export function PaymentsView(props: ViewProps) {
       <section aria-labelledby="up-h">
         <h2 id="up-h" className="tn-heading">Coming up</h2>
         {upcoming.length ? upcoming.map(row) : <p className={styles.empty}>Nothing to pay yet. Add your next deposit or balance.</p>}
+        {upcoming.some((p) => p.due_on) ? (
+          <a href={`/w/${props.weddingId}/calendar/payments`} className={styles.calLink} download>Add every due date to your calendar (Apple or Outlook)</a>
+        ) : null}
       </section>
 
       {planned.length ? (

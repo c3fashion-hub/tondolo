@@ -18,3 +18,4 @@ textarea.tn-input { padding: 10px 12px; min-height: 88px; }
 .cashLink span span { font-size: 13px; color: var(--ink-muted); }
 .cashLink > span:last-child { font-size: 22px; color: var(--raspberry-ink); }
 .buttons { display: flex; gap: 8px; flex-wrap: wrap; }
+.calLink { display: inline-flex; align-items: center; min-height: 44px; font-size: 14px; font-weight: 600; color: var(--raspberry-ink); text-underline-offset: 3px; }

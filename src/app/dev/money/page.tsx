@@ -8,13 +8,15 @@ import { CashView } from "@/app/w/[id]/cash/CashView";
 import { RateBook } from "@/lib/rates.ts";
 import { protectionFor } from "@/lib/protection.ts";
 import { ScanPreview } from "./ScanPreview";
+import { Settings } from "@/app/w/[id]/settings/Settings";
+import { can } from "@/lib/roles.ts";
 import {
   BOOKINGS, BUDGETS, CONTRACT_CHECKS, DESTINATION, PAYMENTS, PEOPLE, RATES, SUPPLIERS, TODAY, WEDDING_DATE,
 } from "@/lib/example/wedding.ts";
 import styles from "@/app/w/[id]/shell.module.css";
 
 // Local preview of the money screens with the example wedding. Never served on the live site.
-// ?screen=overview | first | health | budget | cash | scan | contract | supplier&id=s-rita, or payments by default.
+// ?screen=overview | first | health | budget | cash | scan | contract | settings | supplier&id=s-rita, or payments by default.
 export default async function MoneyPreview({ searchParams }: { searchParams: Promise<{ screen?: string; id?: string }> }) {
   const { screen, id } = await searchParams; // read first, so this page is built per request
   if (process.env.TONDOLO_PREVIEW !== "1") notFound();
@@ -27,6 +29,12 @@ export default async function MoneyPreview({ searchParams }: { searchParams: Pro
   else if (screen === "first") view = <OverviewView {...common} names="Ade & Sam" couple payments={[]} />;
   else if (screen === "health") view = <HealthView {...common} />;
   else if (screen === "scan" || screen === "contract") view = <ScanPreview mode={screen} />;
+  else if (screen === "settings") {
+    const wedding = { id: "example", home_currency: "GBP", wedding_date: WEDDING_DATE, destination: DESTINATION, names: "Ade & Sam", rough_budget_minor: 5_800_000, starter_used: true, unlocked_at: "2026-10-01" };
+    const members = PEOPLE.map((m) => ({ id: m.id, user_id: m.id, role: m.role, status: "active" as const, display_name: m.name, invite_email: null, invite_expires_at: null, payer_currency: m.payer_currency }));
+    view = <Settings wedding={wedding} me={members[0]} members={members} myEmail="ade@example.com" rights={can("owner")} today={TODAY} preview
+      checkin={{ day: 7, at_time: "19:00", second_day: 3, time_zone: "Europe/London" }} emails={{ reminders: true, weekly: false }} />;
+  }
   else if (screen === "cash") view = <CashView {...common} preview />;
   else if (screen === "supplier") {
     const sup = SUPPLIERS.find((x) => x.id === id) ?? SUPPLIERS[0];

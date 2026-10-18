@@ -14,3 +14,7 @@
 .role span { display: flex; flex-direction: column; gap: 2px; font-size: 14px; line-height: 20px; }
 .link { padding: 12px; border-radius: var(--radius-md); background: var(--paper); border: 1px solid var(--line); font-size: 13px; overflow-wrap: anywhere; user-select: all; }
 .share { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.toggle { display: grid; grid-template-columns: 24px 1fr; gap: 10px; align-items: start; padding: 12px; border: 1px solid var(--line); border-radius: var(--radius-md); cursor: pointer; min-height: 44px; }
+.toggle input { width: 22px; height: 22px; margin: 1px 0 0; accent-color: var(--raspberry); }
+.toggle span { display: flex; flex-direction: column; gap: 2px; font-size: 15px; line-height: 21px; }
+.rowEdit { display: flex; justify-content: space-between; align-items: center; gap: 12px; }

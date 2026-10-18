@@ -59,7 +59,7 @@ export function OverviewView(props: OverviewProps) {
             <ol className={shell.steps}>
               <li><span className={`${shell.num} ${shell.numNext}`}>1</span>Add your venue and planner payments</li>
               <li><span className={shell.num}>2</span><Link href={`${base}/settings#people`}>Invite your partner to see it too</Link></li>
-              <li><span className={shell.num}>3</span>Pick a weekly check-in time</li>
+              <li><span className={shell.num}>3</span><Link href={`${base}/settings#checkin`}>Pick a weekly check-in time</Link></li>
             </ol>
           </section>
         ) : null}
