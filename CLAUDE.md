@@ -58,3 +58,10 @@ Prices, refunds and what's included; legal wording; tax; going live with Stripe;
 - `npm run dev`: local app on http://localhost:3000
 - `npm run typecheck`, `npm test` (unit, Node's built-in runner), `npm run test:e2e` (Playwright, uses /opt/pw-browsers Chromium)
 - `npm run build`: production build (what Netlify runs)
+- Database: migrations in `supabase/migrations` (apply in order); role tests in `supabase/tests/roles_test.sql` (run in the SQL editor; it rolls back and ends with ALL ROLE TESTS PASSED)
+- `npm run test:live`: sharing flow against the real Supabase project with temporary test people (needs E2E_PASSWORD and network access to *.supabase.co)
+
+## Sharing
+- Invites are links the couple send themselves (WhatsApp, message or email from their own phone). Tondolo sends nothing to anyone on the couple's behalf.
+- An invite link works once, for 14 days, and only for the invited email. Only a hash of the link is stored.
+- Sign-in emails carry a 6-digit code and a link; the code keeps people inside the home-screen app on iPhone. Setup in `docs/sign-in-setup.md`.

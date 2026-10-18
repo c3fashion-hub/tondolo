@@ -1,0 +1,16 @@
+.section { display: flex; flex-direction: column; gap: 12px; }
+.list { margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; }
+.person { display: grid; grid-template-columns: 40px minmax(0, 1fr) auto; gap: 12px; align-items: center; padding: 12px 0; border-bottom: 1px solid var(--line); }
+.avatar { width: 40px; height: 40px; border-radius: 9999px; background: var(--sugar); color: var(--ink); font-weight: 700; display: flex; align-items: center; justify-content: center; }
+.who { display: flex; flex-direction: column; gap: 2px; min-width: 0; overflow-wrap: anywhere; }
+.rows { display: flex; flex-direction: column; }
+.row { padding: 12px 0; border-bottom: 1px solid var(--line); font-size: 15px; }
+.notice { margin: 0; padding: 12px; border-radius: var(--radius-md); background: var(--sugar); font-size: 13px; line-height: 19px; }
+.roles { border: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px; }
+.roles legend { font-size: 14px; font-weight: 600; margin-bottom: 4px; padding: 0; }
+.role { display: grid; grid-template-columns: 24px 1fr; gap: 8px; align-items: start; padding: 12px; border: 1px solid var(--line); border-radius: var(--radius-md); cursor: pointer; }
+.role input { width: 20px; height: 20px; margin: 2px 0 0; accent-color: var(--raspberry); }
+.role[data-disabled="true"] { opacity: 0.6; cursor: not-allowed; }
+.role span { display: flex; flex-direction: column; gap: 2px; font-size: 14px; line-height: 20px; }
+.link { padding: 12px; border-radius: var(--radius-md); background: var(--paper); border: 1px solid var(--line); font-size: 13px; overflow-wrap: anywhere; user-select: all; }
+.share { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }

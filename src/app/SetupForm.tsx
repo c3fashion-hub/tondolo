@@ -41,7 +41,7 @@ export function SetupForm() {
     }
     setErrors({});
     saveSetupDraft(result.draft);
-    router.push("/start");
+    router.push("/save");
   }
 
   return (

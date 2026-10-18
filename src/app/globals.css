@@ -132,3 +132,18 @@ select.tn-input { appearance: none; padding-right: 36px; background-image: url("
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; }
 }
+
+/* Dialog that presents a bottom sheet */
+.tn-dialog { padding: 0; border: none; background: transparent; max-width: 560px; width: 100%; max-height: 92dvh; margin: auto auto 0; color: inherit; overflow: visible; }
+.tn-dialog::backdrop { background: rgba(30, 20, 32, 0.45); }
+.tn-dialog .tn-sheet { max-height: 92dvh; overflow-y: auto; padding-bottom: calc(var(--space-6) + env(safe-area-inset-bottom, 0px)); }
+
+/* Shared layout for signed-out pages */
+.tn-page { max-width: 480px; min-height: 100dvh; margin: 0 auto; padding: calc(32px + env(safe-area-inset-top, 0px)) 20px calc(24px + env(safe-area-inset-bottom, 0px)); display: flex; flex-direction: column; gap: var(--space-6); }
+.tn-stack { display: flex; flex-direction: column; gap: var(--space-4); }
+.tn-card { display: flex; flex-direction: column; gap: var(--space-3); padding: 18px var(--space-4); border-radius: var(--radius-md); background: var(--surface); border: 1px solid var(--line); }
+.tn-card p, .tn-stack p { margin: 0; }
+.tn-back { align-self: flex-start; display: inline-flex; align-items: center; min-height: 44px; font-size: 14px; font-weight: 600; color: var(--raspberry-ink); text-decoration: none; }
+.tn-note { margin: 0; padding: var(--space-3); border-radius: var(--radius-md); background: var(--sugar); font-size: 14px; line-height: 20px; }
+.tn-alert { margin: 0; padding: var(--space-3); border-radius: var(--radius-md); background: var(--alert-soft); color: var(--ink); font-size: 14px; line-height: 20px; }
+.tn-code { font-size: 24px; letter-spacing: 0.3em; text-align: center; font-variant-numeric: tabular-nums; }

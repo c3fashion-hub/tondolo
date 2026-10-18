@@ -44,15 +44,21 @@ test("rejects a budget that isn't an amount", async ({ page }) => {
   await expect(page).toHaveURL("/");
 });
 
-test("carries the answers to the next step", async ({ page }) => {
+test("asks for an email to save the wedding", async ({ page }) => {
   await page.goto("/");
   await fillValid(page);
   await page.getByRole("button", { name: "Start my budget" }).click();
-  await expect(page).toHaveURL("/start");
-  await expect(page.getByText("Ade & Sam")).toBeVisible();
-  await expect(page.getByText("Porto, Portugal · Sat 26 June 2027")).toBeVisible();
-  await expect(page.getByText("Rough budget £58,000")).toBeVisible();
-  await expect(page.getByText("Starting with the standard budget")).toBeVisible();
+  await expect(page).toHaveURL("/save");
+  await expect(page.getByRole("heading", { level: 1, name: "Save your wedding" })).toBeVisible();
+  await expect(page.getByLabel("Your email")).toBeVisible();
+  const draft = await page.evaluate(() => localStorage.getItem("tondolo.setupDraft.v1"));
+  expect(JSON.parse(draft!)).toMatchObject({ weddingDate: "2027-06-26", destination: "Porto, Portugal", names: "Ade & Sam", roughBudgetMinor: 5_800_000 });
+});
+
+test("offers sign-in to people who already use Tondolo", async ({ page }) => {
+  await page.goto("/");
+  await page.getByRole("link", { name: "Sign in" }).click();
+  await expect(page).toHaveURL("/sign-in");
 });
 
 test("fits a 320px-wide phone without sideways scrolling", async ({ page }) => {

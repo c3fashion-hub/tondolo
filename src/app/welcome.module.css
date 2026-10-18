@@ -20,3 +20,5 @@
 .actions { display: flex; flex-direction: column; gap: 10px; margin-top: auto; }
 .notice { margin: 0; font-size: 12px; line-height: 17px; text-align: center; color: var(--ink-muted); }
 .actions a { text-decoration: none; }
+.signIn { margin: calc(-1 * var(--space-2)) 0 0; text-align: center; font-size: 14px; }
+.signIn a { display: inline-flex; align-items: center; min-height: 44px; font-weight: 600; color: var(--raspberry-ink); }

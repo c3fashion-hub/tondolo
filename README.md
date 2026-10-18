@@ -23,5 +23,5 @@ npm run build && npm run test:e2e   # browser tests against the production build
 
 ## Build stages
 
-1. Foundations and the look (this stage): project, design tokens and components, welcome and setup screen, installable to the home screen.
-2. Sign-in, weddings and sharing. 3. Payments, budget and currencies. 4. Overview and the health check. 5. Protecting payments. 6. Scanning and contract checks. 7. Reminders and calendar. 8. Voice notes, briefing and questions. 9. Checkout with Stripe. 10. Notices, privacy and your data.
+1. Foundations and the look: project, design tokens and components, welcome and setup screen, installable to the home screen.
+2. Sign-in, weddings and sharing (this stage): email code or link, the five places and their rights, invites, Settings. 3. Payments, budget and currencies. 4. Overview and the health check. 5. Protecting payments. 6. Scanning and contract checks. 7. Reminders and calendar. 8. Voice notes, briefing and questions. 9. Checkout with Stripe. 10. Notices, privacy and your data.

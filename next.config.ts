@@ -1,6 +1,7 @@
 import type { NextConfig } from "next";
 
 const isDev = process.env.NODE_ENV !== "production";
+const supabase = process.env.NEXT_PUBLIC_SUPABASE_URL ?? "";
 
 // Strict by default; each stage adds only the origins it needs.
 const csp = [
@@ -9,7 +10,7 @@ const csp = [
   "style-src 'self' 'unsafe-inline'",
   "img-src 'self' data: blob:",
   "font-src 'self'",
-  `connect-src 'self'${isDev ? " ws:" : ""}`,
+  `connect-src 'self' ${supabase}${isDev ? " ws:" : ""}`,
   "manifest-src 'self'",
   "frame-ancestors 'none'",
   "base-uri 'self'",

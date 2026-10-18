@@ -1,0 +1,10 @@
+.shell { min-height: 100dvh; display: flex; flex-direction: column; max-width: 560px; margin: 0 auto; }
+.content { flex: 1; padding: calc(16px + env(safe-area-inset-top, 0px)) 16px 24px; display: flex; flex-direction: column; gap: 20px; }
+.tabs { position: sticky; bottom: 0; z-index: 10; }
+.card { display: flex; flex-direction: column; gap: 12px; padding: 18px 16px; border-radius: var(--radius-md); background: var(--surface); border: 1px solid var(--line); }
+.card p { margin: 0; font-size: 15px; line-height: 22px; }
+.steps { margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 8px; font-size: 15px; line-height: 22px; }
+.steps li { display: flex; gap: 10px; align-items: center; }
+.steps a { color: inherit; }
+.num { width: 24px; height: 24px; flex: none; border-radius: 9999px; background: var(--sugar); color: var(--ink); font-size: 13px; font-weight: 700; display: flex; align-items: center; justify-content: center; }
+.numNext { background: var(--lime); color: var(--on-lime); }
