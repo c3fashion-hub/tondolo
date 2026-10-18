@@ -22,7 +22,7 @@ export type Issue = {
   title: string;
   body: string;
   figure: number | null;     // this issue's own money figure in the home currency, counted once
-  action: { label: string; href: string } | null; // relative to the wedding, e.g. "payments#s-…"
+  action: { label: string; href: string } | null; // relative to the wedding, e.g. "suppliers/…"
 };
 
 export type Health = {
@@ -206,6 +206,6 @@ function supplierIssue(s: SupplierProtection, points: number, money: (m: number)
     title: s.atRisk > 0 ? `${name}: ${money(s.atRisk)} at risk` : `${name}: ${short}`,
     body: paidWords + gap + advice,
     figure: s.atRisk > 0 ? s.atRisk : null,
-    action: { label: action, href: `payments#s-${s.supplier.id}` },
+    action: { label: action, href: `suppliers/${s.supplier.id}` },
   };
 }

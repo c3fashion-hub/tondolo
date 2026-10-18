@@ -20,3 +20,5 @@
 .anchor { scroll-margin-top: 16px; }
 .anchor:target .tn-row-title { text-decoration: underline; }
 .attention { display: flex; flex-direction: column; }
+.rowLink { color: inherit; text-decoration: underline; text-decoration-color: var(--line); text-underline-offset: 3px; display: inline-flex; min-height: 44px; align-items: center; margin: -10px 0; }
+.rowLink:hover { text-decoration-color: currentColor; }

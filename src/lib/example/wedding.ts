@@ -32,7 +32,9 @@ export const WEDDING_DATE = "2027-06-26";
 
 export const SUPPLIERS: Supplier[] = [
   { id: "s-quinta", name: "Quinta do Rio" }, { id: "s-sabores", name: "Sabores do Douro" }, { id: "s-bisi", name: "Bisi Events" },
-  { id: "s-luz", name: "Luz Studio" }, { id: "s-rita", name: "Rita Beauty" }, { id: "s-fado", name: "Fado Duo" },
+  { id: "s-luz", name: "Luz Studio" },
+  { id: "s-rita", name: "Rita Beauty", contact_name: "Rita", phone: "+351 912 000 000", language: "pt" },
+  { id: "s-fado", name: "Fado Duo" },
 ];
 const all3 = { payment_schedule: { state: "present" as const }, named_people: { state: "present" as const }, supplier_cancels: { state: "present" as const } };
 export const CONTRACT_CHECKS: ContractCheck[] = [
@@ -46,7 +48,10 @@ export const CONTRACT_CHECKS: ContractCheck[] = [
 ];
 export const BOOKINGS: BookingConfirmation[] = [
   { supplier_id: "s-luz", arrive_at: "13:00", confirmed_on: "2026-08-18" },
-  { supplier_id: "s-rita", arrive_at: "08:30", confirmed_on: "2026-09-12" },
+  { supplier_id: "s-rita", arrive_at: "08:30", confirmed_on: "2026-09-12", sent_on: "2026-09-10", language: "pt",
+    points: { who: "Rita, plus one assistant", what: "Hair and make-up for Ade and 3 others", whenWhere: "sábado, 26 de junho de 2027, Quinta do Rio, Porto",
+      arrival: "chegada às 08:30, tudo pronto às 12:30", price: "1100 € no total, com deslocação e IVA incluídos; sinal de 200 € pago; 900 € em numerário no dia" },
+    reply_evidence: "Confirmado! Até lá, Rita" },
   { supplier_id: "s-fado", arrive_at: null, confirmed_on: "2026-10-05" },
 ];
 export const TUNDE = "m-tunde";
@@ -62,10 +67,10 @@ export const PAYMENTS: Payment[] = [
   p({ title: "Planner – final 30%", supplier_id: "s-bisi", amount_minor: 180000, category: "Wedding planner / coordinator", due_on: "2027-05-26" }),
   p({ title: "Photographer – balance", supplier_id: "s-luz", amount_minor: 175000, category: "Photography", due_on: "2027-05-26", paying_member_id: TUNDE }),
   p({ title: "Caterer – balance after final numbers", supplier_id: "s-sabores", amount_minor: 784000, category: "Catering", due_on: "2027-06-12", paying_member_id: MUM }),
-  p({ title: "Hair and make-up – balance", supplier_id: "s-rita", amount_minor: 90000, category: "Hair and make-up", due_on: "2027-06-26", method: "cash" }),
-  p({ title: "Musicians – ceremony", supplier_id: "s-fado", amount_minor: 50000, category: "Music, DJ and sound", due_on: "2027-06-26", method: "cash" }),
-  p({ title: "Supplier food allowance", amount_minor: 30000, category: "Supplier food allowance", due_on: "2027-06-26", method: "cash" }),
-  p({ title: "Tips for staff and drivers", amount_minor: 40000, category: "Final invoices, overtime and tips", due_on: "2027-06-26", method: "cash" }),
+  p({ title: "Hair and make-up – balance", handover_time: "09:00", handover_by: "Sam's sister", supplier_id: "s-rita", amount_minor: 90000, category: "Hair and make-up", due_on: "2027-06-26", method: "cash" }),
+  p({ title: "Musicians – ceremony", handover_time: "16:30", handover_note: "after the ceremony", handover_by: "Best man", supplier_id: "s-fado", amount_minor: 50000, category: "Music, DJ and sound", due_on: "2027-06-26", method: "cash" }),
+  p({ title: "Supplier food allowance", handover_time: "13:00", handover_by: "Bisi", amount_minor: 30000, category: "Supplier food allowance", due_on: "2027-06-26", method: "cash" }),
+  p({ title: "Tips for staff and drivers", handover_note: "end of the night", handover_by: "Best man", amount_minor: 40000, category: "Final invoices, overtime and tips", due_on: "2027-06-26", method: "cash" }),
   p({ title: "DJ and sound – deposit", amount_minor: 42000, category: "Music, DJ and sound", due_on: "2026-11-01", is_estimate: true }),
   p({ title: "DJ and sound – balance", amount_minor: 98000, category: "Music, DJ and sound", due_on: "2027-05-26", is_estimate: true }),
   p({ title: "Supplier flights", amount_minor: 90000, category: "Supplier flights", due_on: "2027-04-26", is_estimate: true }),

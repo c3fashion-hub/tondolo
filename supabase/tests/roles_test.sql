@@ -111,6 +111,7 @@ do $$ begin
   assert pg_temp.rows($q$update public.weddings set destination = 'Lisbon'$q$) = 0, 'Mum cannot change settings';
   assert (select committed from public.wedding_progress(current_setting('t.wid')::uuid)) > 0, 'Mum sees overall progress';
   assert (select count(*) from public.contract_checks) = 0, 'Mum sees no contract checks';
+  assert pg_temp.rows($q$update public.suppliers set phone = '+44 7700 900000'$q$) = 0, 'Mum cannot change supplier details';
 end $$;
 select pg_temp.expect_error($$update public.payments set paying_member_id = current_setting('t.tunde_id')::uuid where title = 'Caterer – deposit'$$, '42501', 'Mum cannot hand her payment to someone else');
 select pg_temp.expect_error($$insert into public.payments (wedding_id, title, amount_minor, currency, paying_member_id) values (current_setting('t.wid')::uuid, 'Sneaky', 100, 'EUR', current_setting('t.tunde_id')::uuid)$$, '42501', 'Mum cannot add a payment for someone else');
@@ -129,6 +130,13 @@ do $$ begin
   assert (select count(*) from public.contract_checks) = 1, 'planner sees contract checks';
 end $$;
 insert into public.booking_confirmations (wedding_id, supplier_id, language, arrive_at, confirmed_on) values (current_setting('t.wid')::uuid, current_setting('t.quinta')::uuid, 'pt', '13:00', current_date);
+do $$ begin
+  assert pg_temp.rows($q$update public.suppliers set phone = '+351 912 000 000', language = 'pt', contact_name = 'Ana' where name = 'Quinta do Rio'$q$) = 1, 'planner can add supplier details';
+  assert pg_temp.rows($q$update public.payments set handover_time = '16:30', handover_by = 'Best man' where title = 'Venue hire – balance'$q$) = 1, 'planner can plan who hands over cash';
+end $$;
+select pg_temp.expect_error($$update public.suppliers set phone = 'call me' where name = 'Quinta do Rio'$$, '23514', 'a phone number is a phone number');
+select pg_temp.expect_error($$update public.suppliers set language = 'it' where name = 'Quinta do Rio'$$, '23514', 'messages in English, French, Portuguese or Spanish');
+select pg_temp.expect_error($$update public.payments set handover_time = '25:00' where title = 'Venue hire – balance'$$, '23514', 'a handover time is a time');
 insert into public.payments (wedding_id, title, amount_minor, currency) values (current_setting('t.wid')::uuid, 'Florist – deposit', 90000, 'EUR');
 select pg_temp.expect_error($$select public.invite_member(current_setting('t.wid')::uuid, 'family', 'Auntie', 'auntie@example.test')$$, 'not_allowed', 'planner cannot invite');
 select pg_temp.expect_error($$select public.remove_member(current_setting('t.mum_id')::uuid)$$, 'not_allowed', 'planner cannot remove people');

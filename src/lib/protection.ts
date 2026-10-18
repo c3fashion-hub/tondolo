@@ -12,8 +12,15 @@ export type MustHave = (typeof MUST_HAVES)[number]["key"];
 export type ClauseState = "present" | "incomplete" | "missing";
 
 export type ContractCheck = { supplier_id: string; clauses: Partial<Record<MustHave, { state: ClauseState; evidence?: string | null }>>; checked_at: string };
-export type BookingConfirmation = { supplier_id: string; arrive_at: string | null; confirmed_on: string | null };
-export type Supplier = { id: string; name: string };
+export type BookingConfirmation = {
+  supplier_id: string; arrive_at: string | null; confirmed_on: string | null;
+  id?: string; points?: Record<string, string>; language?: Language; sent_on?: string | null; reply_evidence?: string | null; created_at?: string;
+};
+export type Supplier = {
+  id: string; name: string;
+  legal_name?: string | null; contact_name?: string | null; phone?: string | null; email?: string | null; language?: Language;
+};
+export type Language = "en" | "fr" | "pt" | "es";
 export type Level = 1 | 2 | 3;
 
 export type SupplierProtection = {

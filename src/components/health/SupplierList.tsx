@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { PaymentRow, type Tone } from "@/components/ui";
 import { formatMinor } from "@/lib/money.ts";
 import { inPlaceSummary, type SupplierProtection } from "@/lib/protection.ts";
@@ -10,7 +11,8 @@ export function supplierStatus(s: SupplierProtection, home: string): { label: st
   return { label: s.level === 1 ? "Needs a contract check" : "Needs a confirmed booking", tone: "due" };
 }
 
-export function SupplierList({ suppliers, home }: { suppliers: SupplierProtection[]; home: string }) {
+// Each supplier links to its own page: details, booking confirmation and claim pack.
+export function SupplierList({ suppliers, home, base }: { suppliers: SupplierProtection[]; home: string; base: string }) {
   const sorted = [...suppliers].sort((a, b) => b.atRisk - a.atRisk || a.level - b.level || b.committed - a.committed);
   return (
     <>
@@ -18,7 +20,8 @@ export function SupplierList({ suppliers, home }: { suppliers: SupplierProtectio
         const st = supplierStatus(s, home);
         return (
           <div key={s.supplier.id} id={`s-${s.supplier.id}`} className={styles.anchor}>
-            <PaymentRow title={s.supplier.name} status={st.label} tone={st.tone}
+            <PaymentRow title={<Link href={`${base}/suppliers/${s.supplier.id}`} className={styles.rowLink}>{s.supplier.name}</Link>}
+              status={st.label} tone={st.tone}
               detail={`Level ${s.level} · ${inPlaceSummary(s)}`}
               amount={formatMinor(s.committed, home, { whole: true })}
               converted={s.paid ? `${formatMinor(s.paid, home, { whole: true })} paid` : "nothing paid yet"} />

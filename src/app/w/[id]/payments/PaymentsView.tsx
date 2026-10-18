@@ -12,14 +12,19 @@ import type { PersonOption } from "@/lib/money-data.ts";
 import type { Role } from "@/lib/roles.ts";
 import { protectionFor, type BookingConfirmation, type ContractCheck } from "@/lib/protection.ts";
 import { SupplierList } from "@/components/health/SupplierList";
+import { PaySafelySheet } from "@/components/protect/PaySafelySheet";
+import { contractGaps, type Supplier } from "@/lib/protection.ts";
+import { languageFor } from "@/lib/messages.ts";
+import { cashPlan } from "@/lib/cash.ts";
+import Link from "next/link";
 import { PaymentSheet } from "./PaymentSheet";
 import { PaidSheet } from "./PaidSheet";
 import styles from "./payments.module.css";
 
 export type ViewProps = {
   weddingId: string; home: string; unlocked: boolean; payments: Payment[]; people: PersonOption[];
-  suppliers: { id: string; name: string }[]; rates: RateRow[]; me: { id: string; role: Role }; seeAll: boolean; today: string;
-  weddingDate: string; checks: ContractCheck[]; bookings: BookingConfirmation[];
+  suppliers: Supplier[]; rates: RateRow[]; me: { id: string; role: Role }; seeAll: boolean; today: string;
+  weddingDate: string; destination: string | null; checks: ContractCheck[]; bookings: BookingConfirmation[];
 };
 
 export const FREE_LIMIT = 5;
@@ -30,7 +35,8 @@ export function PaymentsView(props: ViewProps) {
   const book = useMemo(() => new RateBook(props.rates), [props.rates]);
   const [editing, setEditing] = useState<Payment | "new" | null>(null);
   const [paying, setPaying] = useState<Payment | null>(null);
-  const done = () => { setEditing(null); setPaying(null); router.refresh(); };
+  const [safely, setSafely] = useState<Payment | null>(null);
+  const done = () => { setEditing(null); setPaying(null); setSafely(null); router.refresh(); };
 
   const real = payments.filter((p) => !p.is_estimate);
   const upcoming = real.filter((p) => p.status === "due").sort((a, b) => (a.due_on ?? "9999").localeCompare(b.due_on ?? "9999"));
@@ -39,6 +45,9 @@ export function PaymentsView(props: ViewProps) {
   const protections = props.seeAll
     ? props.suppliers.map((s) => protectionFor(s, payments, props.checks, props.bookings, props.weddingDate, home, book, today)).filter((s) => s.committed > 0)
     : [];
+  const cash = props.seeAll ? cashPlan(payments, props.weddingDate) : null;
+  const supplierOf = (p: Payment) => props.suppliers.find((s) => s.id === p.supplier_id) ?? null;
+  const protectionOf = (p: Payment) => protections.find((s) => s.supplier.id === p.supplier_id) ?? null;
   const nameOf = (id: string | null) => (id ? people.find((m) => m.id === id)?.name : null);
 
   function row(p: Payment) {
@@ -55,6 +64,9 @@ export function PaymentsView(props: ViewProps) {
     return (
       <PaymentRow key={p.id} title={p.title} detail={detail} status={s?.label} tone={s?.tone}
         amount={formatMinor(p.amount_minor, p.currency)} converted={converted}>
+        {p.status === "due" && !p.is_estimate ? (
+          <Button size="sm" onClick={() => setSafely(p)} aria-label={`Pay this safely: ${p.title}`}>Pay this safely</Button>
+        ) : null}
         <Button variant="secondary" size="sm" onClick={() => setEditing(p)} aria-label={`${p.is_estimate ? "Replace with a real quote" : "Edit"}: ${p.title}`}>
           {p.is_estimate ? "Replace with a real quote" : "Edit"}
         </Button>
@@ -80,8 +92,15 @@ export function PaymentsView(props: ViewProps) {
       {protections.length ? (
         <section aria-labelledby="sup-h">
           <h2 id="sup-h" className="tn-heading">Your suppliers</h2>
-          <SupplierList suppliers={protections} home={home} />
+          <SupplierList suppliers={protections} home={home} base={`/w/${props.weddingId}`} />
         </section>
+      ) : null}
+
+      {cash && cash.totals.length ? (
+        <Link href={`/w/${props.weddingId}/cash`} className={styles.cashLink}>
+          <span><b>Cash for the day</b><span>{cash.totals.map((t) => formatMinor(t.minor, t.currency)).join(" + ")} in {cash.days.reduce((a, d) => a + d.envelopes.length, 0)} envelopes</span></span>
+          <span aria-hidden="true">›</span>
+        </Link>
       ) : null}
 
       <section aria-labelledby="up-h">
@@ -103,6 +122,18 @@ export function PaymentsView(props: ViewProps) {
       </section>
 
       <PaymentSheet {...props} book={book} payment={editing} onClose={() => setEditing(null)} onDone={done} />
+      <PaySafelySheet
+        input={safely ? {
+          payment: safely, home, destination: props.destination, supplierName: supplierOf(safely)?.name ?? null,
+          itemHome: protectionOf(safely)?.committed ?? homeValue(safely, home, book, today),
+          contractGaps: (() => { const pr = protectionOf(safely); return pr && pr.level === 1 && pr.contract && !pr.inPlace ? contractGaps(pr.contract) : null; })(),
+        } : null}
+        language={(safely && supplierOf(safely)?.language) || languageFor(props.destination)}
+        contactName={(safely && (supplierOf(safely)?.contact_name ?? null)) || null}
+        converted={safely && safely.currency !== home ? (() => { const v = homeValue(safely, home, book, today); return v === null ? null : `About ${formatMinor(v, home, { whole: true })} today`; })() : null}
+        onClose={() => setSafely(null)}
+        onPaid={() => { const p = safely; setSafely(null); setPaying(p); }}
+      />
       <PaidSheet weddingHome={home} book={book} payment={paying} today={today} onClose={() => setPaying(null)} onDone={done} />
     </>
   );

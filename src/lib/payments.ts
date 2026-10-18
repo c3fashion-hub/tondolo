@@ -15,10 +15,11 @@ export type Payment = {
   supplier_id: string | null; category: string | null; method: Method | null; protected: "yes" | "no" | "not_sure";
   tax_included: boolean | null; tax_rate_bp: number | null; fees_minor: number | null; statement_minor: number | null;
   locked_home_minor: number | null; locked_home_currency: string | null; notes: string | null; due_offset_days: number | null;
+  handover_time?: string | null; handover_note?: string | null; handover_by?: string | null;
 };
 
 export const PAYMENT_COLUMNS =
-  "id, title, amount_minor, currency, status, due_on, paid_on, is_estimate, paying_member_id, supplier_id, category, method, protected, tax_included, tax_rate_bp, fees_minor, statement_minor, locked_home_minor, locked_home_currency, notes, due_offset_days";
+  "id, title, amount_minor, currency, status, due_on, paid_on, is_estimate, paying_member_id, supplier_id, category, method, protected, tax_included, tax_rate_bp, fees_minor, statement_minor, locked_home_minor, locked_home_currency, notes, due_offset_days, handover_time, handover_note, handover_by";
 
 // What a payment is worth in the home currency: locked if paid, today's rate if not. Null while a rate is missing.
 export function homeValue(p: Payment, home: string, book: RateBook, today: string): number | null {

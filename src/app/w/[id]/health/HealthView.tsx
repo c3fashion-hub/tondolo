@@ -75,7 +75,7 @@ export function HealthView(props: HealthProps) {
           <p className="tn-small tn-muted" style={{ margin: "4px 0 0" }}>
             Level 1 needs a contract with the three must-haves. Level 2 needs a short contract or a confirmed booking. Level 3 needs a booking message they reply &ldquo;Confirmed&rdquo; to.
           </p>
-          <SupplierList suppliers={h.suppliers} home={props.home} />
+          <SupplierList suppliers={h.suppliers} home={props.home} base={base} />
         </section>
       ) : null}
 
