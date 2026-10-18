@@ -13,6 +13,8 @@ import { MemberSheet } from "./MemberSheet";
 import { WeddingSheet } from "./WeddingSheet";
 import { CheckinSheet } from "./CheckinSheet";
 import { EmailChoices } from "./EmailChoices";
+import { DeleteSheet } from "./DeleteSheet";
+import Link from "next/link";
 import { CalendarLinks } from "@/components/calendar/CalendarLinks";
 import { checkinLabel, checkinSlots, googleCheckinLink, type Checkin } from "@/lib/calendar.ts";
 import styles from "./settings.module.css";
@@ -24,7 +26,7 @@ export function Settings({ wedding, me, members, myEmail, rights, checkin, email
   checkin: Checkin | null; emails: MyEmails; today: string; preview?: boolean;
 }) {
   const router = useRouter();
-  const [sheet, setSheet] = useState<{ kind: "invite" } | { kind: "member"; member: Member } | { kind: "wedding" } | { kind: "checkin" } | null>(null);
+  const [sheet, setSheet] = useState<{ kind: "invite" } | { kind: "member"; member: Member } | { kind: "wedding" } | { kind: "checkin" } | { kind: "delete" } | null>(null);
   const close = () => setSheet(null);
   const done = () => { setSheet(null); router.refresh(); };
   const cur = currency(wedding.home_currency);
@@ -88,7 +90,14 @@ export function Settings({ wedding, me, members, myEmail, rights, checkin, email
         <EmailChoices weddingId={wedding.id} email={myEmail} reminders={emails.reminders} weekly={emails.weekly} family={me.role === "family"} preview={preview} />
       </section>
 
-      <p className={styles.notice}><b>Please check your information.</b> Tondolo reads documents, converts currencies and suggests actions automatically, and technology can get things wrong. Always check amounts, dates and details against your contracts, invoices and bank statements.</p>
+      <p className={styles.notice}><b>Please check your information.</b> Tondolo reads documents, converts currencies and suggests actions automatically, and technology can get things wrong. Always check amounts, dates and details against your contracts, invoices and bank statements. <Link href="/terms">Terms</Link> · <Link href="/privacy">Privacy</Link></p>
+
+      <section className={styles.section} aria-labelledby="data-h">
+        <h2 id="data-h" className="tn-heading">Your data</h2>
+        <a href={preview ? "#" : `/w/${wedding.id}/export`} download className="tn-btn tn-btn-secondary tn-btn-md tn-btn-block">Download a spreadsheet</a>
+        <p className="tn-small tn-muted">Everything you can see in Tondolo, in a file that opens in Excel, Numbers or Google Sheets.</p>
+        <Button variant="link" block onClick={() => setSheet({ kind: "delete" })}>{rights.deleteWedding ? "Delete everything" : "Delete my account"}</Button>
+      </section>
 
       <section className={styles.section}>
         <p className="tn-small tn-muted">Signed in as {myEmail}</p>
@@ -99,6 +108,7 @@ export function Settings({ wedding, me, members, myEmail, rights, checkin, email
       <MemberSheet member={sheet?.kind === "member" ? sheet.member : null} members={members} onClose={close} onDone={done} />
       {sheet?.kind === "checkin" ? <CheckinSheet open weddingId={wedding.id} checkin={checkin} onClose={close} onDone={done} /> : null}
       <WeddingSheet open={sheet?.kind === "wedding"} wedding={wedding} onClose={close} onDone={done} />
+      <DeleteSheet open={sheet?.kind === "delete"} mode={rights.deleteWedding ? "wedding" : "account"} weddingId={wedding.id} names={wedding.names} onClose={close} preview={preview} />
     </>
   );
 }
