@@ -21,6 +21,7 @@ export default async function SupplierPage({ params }: { params: Promise<{ id: s
   return (
     <SupplierView weddingId={id} protection={protection} payments={data.payments.filter((p) => p.supplier_id === sid)}
       bookings={data.bookings.filter((b) => b.supplier_id === sid)} home={home} weddingDate={data.wedding.wedding_date}
-      destination={data.wedding.destination} today={today} rates={data.rates} />
+      destination={data.wedding.destination} today={today} rates={data.rates}
+      documents={data.documents.filter((d) => d.supplier_id === sid)} suppliers={data.suppliers} />
   );
 }

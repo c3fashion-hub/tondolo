@@ -14,12 +14,18 @@ import { formatShortDate } from "@/lib/dates.ts";
 import { homeValue, statusOf, METHOD_LABEL, type Payment } from "@/lib/payments.ts";
 import { LANGUAGE_NAME, type PricePart } from "@/lib/messages.ts";
 import { MUST_HAVES, contractGaps, inPlaceSummary, type BookingConfirmation, type SupplierProtection } from "@/lib/protection.ts";
+import { ScanSheet } from "@/components/scan/ScanSheet";
+import { openDocument } from "@/lib/scan-client.ts";
+import type { DocumentRow } from "@/lib/money-data.ts";
 import styles from "@/components/protect/protect.module.css";
 
 export type SupplierViewProps = {
   weddingId: string; protection: SupplierProtection; payments: Payment[]; bookings: BookingConfirmation[];
   home: string; weddingDate: string; destination: string | null; today: string; rates: RateRow[]; preview?: boolean;
+  documents: DocumentRow[]; suppliers: { id: string; name: string }[];
 };
+
+const KIND: Record<string, string> = { quote: "Quote", contract: "Contract", invoice: "Invoice", receipt: "Receipt", other: "Document" };
 
 // What a booking costs and how the balance is paid, for the price point of the booking message.
 function priceOf(payments: Payment[], weddingDate: string): PricePart | null {
@@ -41,7 +47,7 @@ export function SupplierView(props: SupplierViewProps) {
   const sup = s.supplier;
   const router = useRouter();
   const book = useMemo(() => new RateBook(props.rates), [props.rates]);
-  const [sheet, setSheet] = useState<"confirm" | "confirmed" | "details" | null>(null);
+  const [sheet, setSheet] = useState<"confirm" | "confirmed" | "details" | "contract" | null>(null);
   const done = () => { setSheet(null); if (!props.preview) router.refresh(); };
   const st = supplierStatus(s, home);
   const base = `/w/${weddingId}`;
@@ -69,8 +75,11 @@ export function SupplierView(props: SupplierViewProps) {
                   return <li key={m.key}><b>{state}:</b> {m.label}</li>;
                 })}
               </ul>
-            ) : <p className="tn-muted">No contract checked yet. Checking a contract arrives with scanning.</p>}
+            ) : <p className="tn-muted">No contract checked yet.</p>}
             {s.contract && !s.inPlace ? <p>{contractGaps(s.contract)}. Ask {sup.name} to add {s.contract.missing.length + s.contract.incomplete.length === 1 ? "it" : "them"} before your next payment.</p> : null}
+            <Button block variant={s.contract ? "secondary" : "primary"} onClick={() => setSheet("contract")}>
+              {s.contract ? "Check a new version of the contract" : "Check the contract"}
+            </Button>
           </>
         ) : (
           <>
@@ -115,9 +124,23 @@ export function SupplierView(props: SupplierViewProps) {
         })}
       </section>
 
+      <section aria-labelledby="doc-h">
+        <h2 id="doc-h" className="tn-heading">Documents</h2>
+        {props.documents.length ? (
+          <ul className={styles.docs}>
+            {props.documents.map((d) => (
+              <li key={d.id}>
+                <span><b>{d.file_name}</b><span>{KIND[d.kind ?? "other"] ?? "Document"} · added {formatShortDate(d.created_at.slice(0, 10))}{d.confirmed_at ? "" : " · not checked yet"}</span></span>
+                <Button size="sm" variant="secondary" onClick={() => openDocument(d.file_path)} aria-label={`Open ${d.file_name}`}>Open</Button>
+              </li>
+            ))}
+          </ul>
+        ) : <p className="tn-muted" style={{ margin: "8px 0 0" }}>Quotes, invoices and contracts you scan for {sup.name} appear here.</p>}
+      </section>
+
       <section className={styles.card} aria-labelledby="claim-h">
         <h2 id="claim-h" className="tn-heading">If something goes wrong</h2>
-        <p>The claim pack puts the booking, every payment, what the contract says, the booking confirmation and a dated timeline in one PDF, ready for your card company, insurer or a consumer body.</p>
+        <p>The claim pack puts the booking, every payment, what the contract says, the booking confirmation, a dated timeline and your documents in one PDF, ready for your card company, insurer or a consumer body.</p>
         <a href={`${base}/suppliers/${sup.id}/claim-pack`} className={buttonClass({ variant: "secondary", block: true })} download>Download the claim pack (PDF)</a>
       </section>
 
@@ -126,6 +149,10 @@ export function SupplierView(props: SupplierViewProps) {
           today={today} price={priceOf(props.payments, props.weddingDate)} preview={props.preview} onClose={() => setSheet(null)} onSent={done} />
       ) : null}
       <ConfirmedSheet open={sheet === "confirmed"} weddingId={weddingId} supplier={sup} booking={waiting} today={today} onClose={() => setSheet(null)} onDone={done} />
+      {sheet === "contract" ? (
+        <ScanSheet open mode="contract" weddingId={weddingId} destination={props.destination} today={today} suppliers={props.suppliers}
+          supplierName={sup.name} onClose={() => setSheet(null)} onDone={done} />
+      ) : null}
       {sheet === "details" ? <SupplierSheet open supplier={sup} onClose={() => setSheet(null)} onDone={done} /> : null}
     </>
   );

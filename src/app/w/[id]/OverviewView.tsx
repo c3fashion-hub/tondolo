@@ -50,7 +50,7 @@ export function OverviewView(props: OverviewProps) {
         <section className={shell.card}>
           <h1 className="tn-heading" style={{ fontSize: 22, lineHeight: "28px" }}>Add your first payment</h1>
           <p className="tn-muted">Start with the one that worries you most, usually the venue. A photo of the quote or invoice is enough.</p>
-          <Link href={`${base}/payments`} className={buttonClass({ block: true })}>Scan a quote or invoice</Link>
+          <Link href={`${base}/payments?scan=1`} className={buttonClass({ block: true })}>Scan a quote or invoice</Link>
           <Link href={`${base}/payments`} className={buttonClass({ variant: "secondary", block: true })}>Add it by hand</Link>
         </section>
         {props.couple ? (

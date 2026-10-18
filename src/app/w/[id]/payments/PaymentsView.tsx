@@ -17,6 +17,9 @@ import { contractGaps, type Supplier } from "@/lib/protection.ts";
 import { languageFor } from "@/lib/messages.ts";
 import { cashPlan } from "@/lib/cash.ts";
 import Link from "next/link";
+import { useEffect } from "react";
+import { ScanSheet } from "@/components/scan/ScanSheet";
+import type { Mode } from "@/lib/scan-client.ts";
 import { PaymentSheet } from "./PaymentSheet";
 import { PaidSheet } from "./PaidSheet";
 import styles from "./payments.module.css";
@@ -36,6 +39,11 @@ export function PaymentsView(props: ViewProps) {
   const [editing, setEditing] = useState<Payment | "new" | null>(null);
   const [paying, setPaying] = useState<Payment | null>(null);
   const [safely, setSafely] = useState<Payment | null>(null);
+  const [scanning, setScanning] = useState<Mode | null>(null);
+  // "Scan a quote or invoice" on the first-open screen lands here with ?scan=1.
+  useEffect(() => {
+    if (props.seeAll && new URLSearchParams(window.location.search).get("scan") === "1") setScanning("scan");
+  }, [props.seeAll]);
   const done = () => { setEditing(null); setPaying(null); setSafely(null); router.refresh(); };
 
   const real = payments.filter((p) => !p.is_estimate);
@@ -82,10 +90,19 @@ export function PaymentsView(props: ViewProps) {
       <h1 className="tn-title">Payments</h1>
       <RatesNotice />
       <section className={styles.panel}>
-        <p><b>Add each deposit, instalment and balance</b> as its own payment, in the currency the supplier charges.</p>
-        <Button onClick={() => setEditing("new")} block>Add a payment</Button>
+        {!props.seeAll ? <p><b>Add each deposit, instalment and balance</b> as its own payment, in the currency the supplier charges.</p> : null}
+        {props.seeAll ? (
+          <>
+            <p><b>Scan quotes, invoices or receipts.</b> Take a photo or upload PDFs, up to 10 at once. We fill in the payments for you to check.</p>
+            <div className={styles.buttons}>
+              <Button size="sm" onClick={() => setScanning("scan")}>Scan a document</Button>
+              <Button size="sm" variant="secondary" onClick={() => setScanning("contract")}>Check a contract</Button>
+            </div>
+          </>
+        ) : null}
+        <Button onClick={() => setEditing("new")} block variant={props.seeAll ? "secondary" : "primary"}>Add a payment by hand</Button>
         {!unlocked ? (
-          <p className="tn-small tn-muted">Free start: {Math.min(real.length, FREE_LIMIT)} of {FREE_LIMIT} payments added. Scanning quotes and invoices comes soon.</p>
+          <p className="tn-small tn-muted">Free start: {Math.min(real.length, FREE_LIMIT)} of {FREE_LIMIT} payments added{props.seeAll ? ", and 1 document to scan" : ""}.</p>
         ) : null}
       </section>
 
@@ -122,6 +139,10 @@ export function PaymentsView(props: ViewProps) {
       </section>
 
       <PaymentSheet {...props} book={book} payment={editing} onClose={() => setEditing(null)} onDone={done} />
+      {scanning ? (
+        <ScanSheet open mode={scanning} weddingId={props.weddingId} destination={props.destination} today={today}
+          suppliers={props.suppliers} onClose={() => setScanning(null)} onDone={() => { setScanning(null); router.refresh(); }} />
+      ) : null}
       <PaySafelySheet
         input={safely ? {
           payment: safely, home, destination: props.destination, supplierName: supplierOf(safely)?.name ?? null,

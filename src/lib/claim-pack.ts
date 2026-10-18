@@ -13,7 +13,12 @@ export type ClaimInput = {
   names: string | null; destination: string | null; weddingDate: string; home: string; today: string;
   supplier: Supplier; protection: SupplierProtection; payments: Payment[];
   checks: ContractCheck[]; bookings: BookingConfirmation[];
+  attachments?: Attachment[];
 };
+
+// An uploaded document, attached at the end: PDFs page by page, photos one per page.
+// `bytes` is null when it was left out to keep the pack small enough to download.
+export type Attachment = { name: string; kind: string | null; added: string; mime: string; bytes: Uint8Array | null };
 
 export type TimelineEvent = { date: string; text: string; future: boolean };
 
@@ -183,7 +188,44 @@ export async function claimPackPdf(i: ClaimInput): Promise<Uint8Array> {
   for (const e of timeline(i)) w.row([formatLongDate(e.date), `${e.text}${e.future ? " (not yet due)" : ""}`], [110, A4[0] - 2 * M - 110]);
 
   w.heading("Documents");
-  w.text("Attach your contract, invoices, receipts, card or bank statements and screenshots of messages when you send this pack.", { color: MUTED });
+  const files = i.attachments ?? [];
+  // Prepare every attachment first, so the pack's own text all comes before the attached pages.
+  const attached: string[] = [], skipped: string[] = [];
+  const appendix: (() => void)[] = [];
+  for (const a of files) {
+    const caption = `${a.name}${a.kind ? ` (${a.kind})` : ""}, added ${formatLongDate(a.added)}`;
+    if (!a.bytes) { skipped.push(caption); continue; }
+    try {
+      if (a.mime === "application/pdf") {
+        const src = await PDFDocument.load(a.bytes, { ignoreEncryption: true });
+        const pages = await doc.copyPages(src, src.getPageIndices());
+        appendix.push(() => { for (const pg of pages) { doc.addPage(pg); w.pages.push(pg); } });
+      } else if (a.mime === "image/jpeg" || a.mime === "image/png") {
+        const img = a.mime === "image/jpeg" ? await doc.embedJpg(a.bytes) : await doc.embedPng(a.bytes);
+        appendix.push(() => {
+          const page = doc.addPage(A4);
+          w.pages.push(page);
+          const box = { w: A4[0] - 2 * M, h: A4[1] - 2 * M - 40 };
+          const scale = Math.min(box.w / img.width, box.h / img.height, 1);
+          page.drawText(w.safe(caption, bold), { x: M, y: A4[1] - M - 10, size: 10, font: bold, color: INK });
+          page.drawImage(img, { x: M, y: A4[1] - M - 30 - img.height * scale, width: img.width * scale, height: img.height * scale });
+        });
+      } else { skipped.push(caption); continue; }
+      attached.push(caption);
+    } catch { skipped.push(caption); }
+  }
+  if (attached.length) {
+    w.text("Attached at the end of this pack:", { gap: 2 });
+    for (const c of attached) w.text(`• ${c}`, { gap: 1 });
+    w.y -= 6;
+  }
+  if (skipped.length) {
+    w.text("Send these separately (open them from the supplier's page in Tondolo):", { gap: 2 });
+    for (const c of skipped) w.text(`• ${c}`, { gap: 1 });
+    w.y -= 6;
+  }
+  w.text("Add your card or bank statements and screenshots of messages when you send this pack.", { color: MUTED });
+  for (const add of appendix) add();
 
   const n = w.pages.length;
   w.pages.forEach((page, idx) => {

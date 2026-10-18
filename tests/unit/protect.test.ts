@@ -133,3 +133,19 @@ test("the claim pack is a real PDF, and copes with currencies the PDF font can't
   const naira = await claimPackPdf({ ...claim, home: "NGN", protection: { ...claim.protection, committed: 4_530_400_000, paid: 1_400_000_000 } });
   assert.equal(Buffer.from(naira.slice(0, 5)).toString(), "%PDF-");
 });
+
+test("the claim pack attaches uploaded documents, and lists any it had to leave out", async () => {
+  const { PDFDocument } = await import("pdf-lib");
+  const contract = await PDFDocument.create();
+  contract.addPage(); contract.addPage();
+  const png = Uint8Array.from(Buffer.from("iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==", "base64"));
+  const bytes = await claimPackPdf({ ...claim, attachments: [
+    { name: "contrato.pdf", kind: "contract", added: "2026-06-10", mime: "application/pdf", bytes: await contract.save() },
+    { name: "receipt.png", kind: "receipt", added: "2026-06-15", mime: "image/png", bytes: png },
+    { name: "big-scan.pdf", kind: "invoice", added: "2026-06-16", mime: "application/pdf", bytes: null },
+  ] });
+  const pack = await PDFDocument.load(bytes);
+  const own = (await PDFDocument.load(await claimPackPdf(claim))).getPageCount();
+  // The pack's own pages (the list of documents may add one), then two contract pages and one photo page.
+  assert.ok(pack.getPageCount() >= own + 3 && pack.getPageCount() <= own + 4, `${pack.getPageCount()} pages`);
+});

@@ -17,3 +17,4 @@ textarea.tn-input { padding: 10px 12px; min-height: 88px; }
 .cashLink b { font-size: 15px; }
 .cashLink span span { font-size: 13px; color: var(--ink-muted); }
 .cashLink > span:last-child { font-size: 22px; color: var(--raspberry-ink); }
+.buttons { display: flex; gap: 8px; flex-wrap: wrap; }

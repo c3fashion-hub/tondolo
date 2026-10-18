@@ -1,0 +1,27 @@
+.file { display: flex; gap: 10px; align-items: center; padding: 10px 12px; border-radius: var(--radius-md); background: var(--paper); border: 1px solid var(--line); }
+.file > span { display: flex; flex-direction: column; min-width: 0; }
+.file b { font-size: 14px; overflow-wrap: anywhere; }
+.file span span { font-size: 12px; color: var(--ink-muted); }
+.two { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+.payments { border: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 12px; }
+.payment { display: flex; flex-direction: column; gap: 10px; padding: 12px; border: 1px solid var(--line); border-radius: var(--radius-md); background: var(--surface); }
+.include { display: flex; align-items: center; gap: 10px; min-height: 44px; font-weight: 600; font-size: 14px; }
+.include input { width: 22px; height: 22px; accent-color: var(--raspberry); }
+.warn { display: flex; flex-direction: column; gap: 6px; padding: 12px; border-radius: var(--radius-md); background: var(--amber-soft); }
+.warn p, .warn ul { margin: 0; font-size: 14px; line-height: 20px; }
+.warn ul { padding-left: 18px; }
+.warnTitle { margin: 0; font-family: var(--font-sans); font-size: 15px; color: var(--amber); }
+.notice { margin: 0; font-size: 13px; line-height: 18px; color: var(--ink-muted); }
+.progress { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; }
+.progress li { display: flex; flex-direction: column; padding: 10px 0; border-bottom: 1px solid var(--line); font-size: 14px; }
+.progress li span { color: var(--ink-muted); font-size: 13px; }
+.progress b { overflow-wrap: anywhere; }
+.pickLabel { cursor: pointer; }
+.clauses { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; }
+.clause { display: flex; flex-direction: column; gap: 6px; padding: 12px 0; border-bottom: 1px solid var(--line); }
+.clause:last-child { border-bottom: none; }
+.clauseHead { display: flex; justify-content: space-between; align-items: center; gap: 8px; font-size: 15px; }
+.evidence { font-size: 13px; line-height: 18px; color: var(--ink-muted); font-style: italic; }
+.inline { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 8px; align-items: center; font-size: 13px; color: var(--ink-muted); }
+.more summary { min-height: 44px; display: flex; align-items: center; font-weight: 600; color: var(--raspberry-ink); cursor: pointer; }
+.pickInput:focus-visible + .pickLabel { box-shadow: var(--focus-ring); }

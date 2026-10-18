@@ -64,6 +64,7 @@ Prices, refunds and what's included; legal wording; tax; going live with Stripe;
 - Local preview of money screens with the example wedding: `TONDOLO_PREVIEW=1 npm start`, then `/dev/money` (payments) and `?screen=overview`, `first`, `health`, `budget`, `cash` or `supplier&id=s-rita` (404 on the live site). The browser tests run a second server with the preview on.
 - Money health check: `src/lib/health.ts` (the approved formula), `src/lib/protection.ts` (levels, money at risk), `src/lib/tax.ts` (the Kit's IVA rates). `tests/unit/health.test.ts` pins the example wedding at 71.
 - Protecting payments: `src/lib/messages.ts` (the Kit's six-point booking message: English and French word for word from the Kit, Portuguese and Spanish drafts to be proofread; receipt requests; WhatsApp and email links the couple send themselves), `src/lib/pay-safely.ts`, `src/lib/cash.ts`, `src/lib/claim-pack.ts` (PDF with pdf-lib). Tests in `tests/unit/protect.test.ts`.
+- Scanning: `supabase/functions/read-document` (Claude reads one document; key in Supabase secrets, see `docs/scanning-setup.md`), shared schema and instructions in `supabase/functions/_shared/reading.ts`, review screens in `src/components/scan`, allowance in the database (`claim_document_read`). Document tests: `supabase/tests/documents_test.sql` (ends with ALL DOCUMENT TESTS PASSED). Preview: `/dev/money?screen=scan` and `?screen=contract`.
 - `npm run test:live`: sharing flow against the real Supabase project with temporary test people (needs E2E_PASSWORD and network access to *.supabase.co)
 
 ## Sharing
