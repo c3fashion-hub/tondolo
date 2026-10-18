@@ -1,5 +1,5 @@
 // The reminder and weekly summary emails: subject, plain text and simple HTML. Shared by the
-// send-reminders function and the app's tests. Plain TypeScript with no imports (Deno and Node).
+// send-reminders function and the app's tests. Plain TypeScript, importing only shared files (Deno and Node).
 // Calm, plain British English; never promises money is safe.
 
 export type DueItem = {

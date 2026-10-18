@@ -1,6 +1,6 @@
 // What the AI is asked to read from a quote, invoice, receipt or contract, and the exact shape it
 // must answer in (structured outputs). Shared by the read-document function and the app's tests.
-// Plain TypeScript with no imports, so it runs in both Deno and Node.
+// Plain TypeScript; it imports only other plain shared files, so it runs in both Deno and Node.
 
 export { CATEGORY_NAMES } from "./categories.ts";
 import { CATEGORY_NAMES } from "./categories.ts";
