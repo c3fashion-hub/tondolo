@@ -52,14 +52,14 @@ export function reminderEmail(o: { displayName: string; names: string | null; it
   const hello = `Hello ${o.displayName},`;
   const intro = items.length === 1 ? "A payment for your wedding is coming up." : `${items.length} payments for your wedding are coming up.`;
   const advice = "Before you pay: use a card if you can, pay in the supplier's currency, and keep the receipt. Tondolo's Pay this safely shows how.";
-  const footer = `You're getting this because you turned on payment reminders${o.names ? ` for ${o.names}` : ""}. Change your emails in Settings: ${o.settingsUrl}`;
+  const footer = `You're getting this because payment reminders are on${o.names ? ` for ${o.names}` : ""}. Change your emails in Settings: ${o.settingsUrl}`;
   const text = [hello, "", intro, "", ...items.map((i) => `- ${itemLine(i)}`), "", advice, "", `Open your payments: ${o.paymentsUrl}`, "", footer].join("\n");
   const html = shell(subject, `<p style="margin:0 0 12px;font-size:16px;">${esc(hello)}</p>
 <p style="margin:0 0 12px;font-size:16px;line-height:24px;">${esc(intro)}</p>
 <ul style="margin:0 0 12px;padding-left:20px;font-size:16px;line-height:24px;">${items.map((i) => `<li style="margin:0 0 8px;">${esc(itemLine(i))}</li>`).join("")}</ul>
 <p style="margin:0;font-size:14px;line-height:20px;color:#6A5A66;">${esc(advice)}</p>
 ${button(o.paymentsUrl, "Open your payments")}`,
-    `You're getting this because you turned on payment reminders${o.names ? ` for ${esc(o.names)}` : ""}. <a href="${esc(o.settingsUrl)}" style="color:#C2255C;">Change your emails in Settings</a>.`);
+    `You're getting this because payment reminders are on${o.names ? ` for ${esc(o.names)}` : ""}. <a href="${esc(o.settingsUrl)}" style="color:#C2255C;">Change your emails in Settings</a>.`);
   return { subject, text, html };
 }
 

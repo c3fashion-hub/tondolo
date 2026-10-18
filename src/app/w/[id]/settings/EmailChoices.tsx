@@ -9,20 +9,17 @@ import styles from "./settings.module.css";
 const TEST_ERRORS: Record<string, string> = {
   not_configured: "Email isn't switched on yet. Once it is, reminders start the next morning.",
   too_many: "That's a few tests already. Try again in an hour.",
-  not_allowed: "Only the couple and the planner can have reminder emails for now.",
+  not_allowed: "You can only send a test to yourself, from a wedding you belong to.",
 };
 
-// Each person chooses their own emails. Nobody turns emails on for someone else.
+// Each person chooses their own emails. Nobody turns emails on for someone else. Family get
+// reminders only for the payments they cover, and no weekly summary.
 export function EmailChoices({ weddingId, email, reminders: r0, weekly: w0, family, preview }: {
   weddingId: string; email: string; reminders: boolean; weekly: boolean; family: boolean; preview?: boolean;
 }) {
   const [reminders, setReminders] = useState(r0);
   const [weekly, setWeekly] = useState(w0);
   const [status, setStatus] = useState("");
-
-  if (family) {
-    return <p className="tn-small tn-muted">Email reminders for family members are coming soon. The couple can see every due date in the app.</p>;
-  }
 
   async function save(nextReminders: boolean, nextWeekly: boolean) {
     setReminders(nextReminders); setWeekly(nextWeekly);
@@ -48,12 +45,16 @@ export function EmailChoices({ weddingId, email, reminders: r0, weekly: w0, fami
     <div className="tn-stack" style={{ gap: 8 }}>
       <label className={styles.toggle}>
         <input type="checkbox" checked={reminders} onChange={(e) => save(e.target.checked, weekly)} />
-        <span><b>Payment reminders</b><span className="tn-small tn-muted">An email 14 days and 3 days before each due date.</span></span>
+        <span><b>Payment reminders</b><span className="tn-small tn-muted">{family
+          ? "An email 14 days and 3 days before each payment you\u2019re covering."
+          : "An email 14 days and 3 days before each due date."}</span></span>
       </label>
-      <label className={styles.toggle}>
-        <input type="checkbox" checked={weekly} onChange={(e) => save(reminders, e.target.checked)} />
-        <span><b>Weekly summary</b><span className="tn-small tn-muted">Days to go, what&rsquo;s due next and your totals, on the morning of your check-in day.</span></span>
-      </label>
+      {family ? null : (
+        <label className={styles.toggle}>
+          <input type="checkbox" checked={weekly} onChange={(e) => save(reminders, e.target.checked)} />
+          <span><b>Weekly summary</b><span className="tn-small tn-muted">Days to go, what&rsquo;s due next and your totals, on the morning of your check-in day.</span></span>
+        </label>
+      )}
       <p className="tn-small tn-muted">Emails go to {email}.</p>
       <Button variant="secondary" block onClick={test}>Send me a test reminder</Button>
       <p className="tn-small" role="status" style={{ margin: 0 }}>{status}</p>

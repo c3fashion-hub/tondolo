@@ -43,7 +43,7 @@ Deno.serve(async (req) => {
     if (!user?.email || typeof body.wedding_id !== "string") return json({ ok: false, error: "signed_out" }, 401);
     const { data: me } = await admin.from("members").select("id, display_name, role, wedding_id, weddings(names)")
       .eq("wedding_id", body.wedding_id).eq("user_id", user.id).eq("status", "active").maybeSingle();
-    if (!me || me.role === "family") return json({ ok: false, error: "not_allowed" }, 403);
+    if (!me) return json({ ok: false, error: "not_allowed" }, 403);
     const { data: recent } = await admin.from("alert_log").select("id").eq("member_id", me.id).eq("kind", "test")
       .gte("sent_at", new Date(Date.now() - 3_600_000).toISOString());
     if ((recent?.length ?? 0) >= 3) return json({ ok: false, error: "too_many" }, 429);
