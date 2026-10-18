@@ -10,13 +10,15 @@ import { protectionFor } from "@/lib/protection.ts";
 import { ScanPreview } from "./ScanPreview";
 import { Settings } from "@/app/w/[id]/settings/Settings";
 import { can } from "@/lib/roles.ts";
+import { NotesView } from "@/app/w/[id]/notes/NotesView";
+import { BriefingView } from "@/app/w/[id]/briefing/BriefingView";
 import {
-  BOOKINGS, BUDGETS, CONTRACT_CHECKS, DESTINATION, PAYMENTS, PEOPLE, RATES, SUPPLIERS, TODAY, WEDDING_DATE,
+  BOOKINGS, BUDGETS, CONTRACT_CHECKS, DESTINATION, NOTES, PAYMENTS, PEOPLE, RATES, REMINDERS, SUPPLIERS, TODAY, WEDDING_DATE,
 } from "@/lib/example/wedding.ts";
 import styles from "@/app/w/[id]/shell.module.css";
 
 // Local preview of the money screens with the example wedding. Never served on the live site.
-// ?screen=overview | first | health | budget | cash | scan | contract | settings | supplier&id=s-rita, or payments by default.
+// ?screen=overview | first | health | budget | cash | scan | contract | settings | notes | briefing | supplier&id=s-rita, or payments by default.
 export default async function MoneyPreview({ searchParams }: { searchParams: Promise<{ screen?: string; id?: string }> }) {
   const { screen, id } = await searchParams; // read first, so this page is built per request
   if (process.env.TONDOLO_PREVIEW !== "1") notFound();
@@ -25,7 +27,7 @@ export default async function MoneyPreview({ searchParams }: { searchParams: Pro
     payments: PAYMENTS, budgets: BUDGETS, suppliers: SUPPLIERS, checks: CONTRACT_CHECKS, bookings: BOOKINGS, rates: RATES,
   };
   let view;
-  if (screen === "overview") view = <OverviewView {...common} names="Ade & Sam" couple />;
+  if (screen === "overview") view = <OverviewView {...common} names="Ade & Sam" couple unlocked preview />;
   else if (screen === "first") view = <OverviewView {...common} names="Ade & Sam" couple payments={[]} />;
   else if (screen === "health") view = <HealthView {...common} />;
   else if (screen === "scan" || screen === "contract") view = <ScanPreview mode={screen} />;
@@ -34,6 +36,11 @@ export default async function MoneyPreview({ searchParams }: { searchParams: Pro
     const members = PEOPLE.map((m) => ({ id: m.id, user_id: m.id, role: m.role, status: "active" as const, display_name: m.name, invite_email: null, invite_expires_at: null, payer_currency: m.payer_currency }));
     view = <Settings wedding={wedding} me={members[0]} members={members} myEmail="ade@example.com" rights={can("owner")} today={TODAY} preview
       checkin={{ day: 7, at_time: "19:00", second_day: 3, time_zone: "Europe/London" }} emails={{ reminders: true, weekly: false }} />;
+  }
+  else if (screen === "notes") view = <NotesView weddingId="example" home="GBP" today={TODAY} unlocked notes={NOTES} reminders={REMINDERS} suppliers={SUPPLIERS} payments={PAYMENTS} preview />;
+  else if (screen === "briefing") {
+    view = <BriefingView {...common} name="Ade" meId="m-ade" unlocked people={PEOPLE} reminders={REMINDERS} preview closeHref="/dev/money?screen=overview"
+      checkin={{ day: 7, at_time: "19:00", second_day: 3, time_zone: "Europe/London" }} />;
   }
   else if (screen === "cash") view = <CashView {...common} preview />;
   else if (screen === "supplier") {

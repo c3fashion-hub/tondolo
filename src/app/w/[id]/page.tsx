@@ -23,7 +23,7 @@ export default async function OverviewPage({ params }: { params: Promise<{ id: s
     return (
       <OverviewView weddingId={id} names={wedding.names} destination={wedding.destination} weddingDate={wedding.wedding_date}
         home={home} today={today} payments={payments} budgets={data.budgets} suppliers={data.suppliers}
-        checks={data.checks} bookings={data.bookings} rates={rates} couple={can(me.role).managePeople} />
+        checks={data.checks} bookings={data.bookings} rates={rates} couple={can(me.role).managePeople} unlocked={wedding.unlocked_at !== null} />
     );
   }
 

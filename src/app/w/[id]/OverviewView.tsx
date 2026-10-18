@@ -8,13 +8,14 @@ import { budgetSummary, exposure, feesLost, homeValue, statusOf, totals, type Pa
 import { CATEGORIES } from "@/lib/categories.ts";
 import { healthCheck } from "@/lib/health.ts";
 import { contractGaps, type BookingConfirmation, type ContractCheck, type Supplier } from "@/lib/protection.ts";
+import { VoiceLinks } from "@/components/voice/VoiceLinks";
 import shell from "./shell.module.css";
 import styles from "@/components/health/health.module.css";
 
 export type OverviewProps = {
   weddingId: string; names: string | null; destination: string | null; weddingDate: string; home: string; today: string;
   payments: Payment[]; budgets: { category: string; amount_minor: number }[]; suppliers: Supplier[];
-  checks: ContractCheck[]; bookings: BookingConfirmation[]; rates: RateRow[]; couple: boolean;
+  checks: ContractCheck[]; bookings: BookingConfirmation[]; rates: RateRow[]; couple: boolean; unlocked?: boolean; preview?: boolean;
 };
 
 const SOON_DAYS = 14;
@@ -125,7 +126,7 @@ export function OverviewView(props: OverviewProps) {
             : "Nothing to fix right now."}</span>
         </span>
       </Link>
-
+      {props.unlocked ? <VoiceLinks weddingId={weddingId} couple={props.couple} preview={props.preview} /> : null}
     </>
   );
 }

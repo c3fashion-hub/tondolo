@@ -96,3 +96,13 @@ export const PEOPLE = [
   { id: MUM, name: "Mum", role: "family" as const, payer_currency: "GBP" },
   { id: TUNDE, name: "Uncle Tunde", role: "family" as const, payer_currency: "NGN" },
 ];
+
+// Notes and reminders, private to Ade and Sam (spec: "Notes and reminders").
+export type ExampleNote = { id: string; words: string; kind: "note" | "booking_detail"; supplier_id: string | null; noted_on: string };
+export const NOTES: ExampleNote[] = [
+  { id: "n2", words: "Ceremony on the terrace if it's dry, the lawn if not. Confirm with the Quinta by the end of November.", kind: "note", supplier_id: "s-quinta", noted_on: "2026-10-11" },
+  { id: "n1", words: "Photographer arrives at 13:00 for getting-ready shots", kind: "booking_detail", supplier_id: "s-luz", noted_on: "2026-10-11" },
+];
+export const REMINDERS = [
+  { id: "r1", text: "Confirm the terrace or the lawn with the Quinta", due_on: "2026-10-21", done: false },
+];
