@@ -25,8 +25,10 @@ payment due in 3 days with reminders on: the email arrives the next morning.
 
 ## Who gets what
 
-- Each person chooses their own emails in Settings. The couple have payment reminders on by default;
-  the planner turns them on. The weekly summary is opt-in, sent on the check-in day (Sunday if none).
-- Family emails are off until Mags decides (CLAUDE.md: messages to family are her call).
+- Each person chooses their own emails in Settings. Everyone has payment reminders on by default
+  (Mags, 18 October 2026): the couple and planner for every payment, family only for the payments they
+  cover. The weekly summary is opt-in, sent on the check-in day (Sunday if none); family don't get it.
+- `APP_URL` is where links in the emails point: `https://tondolo.netlify.app` until tondolo.app is
+  connected to the site, then `https://tondolo.app`.
 - Every email sent is logged, so nothing is sent twice. Resend's free plan covers 3,000 emails a month
   and 100 a day; beyond that it's a paid plan (Mags's decision).
