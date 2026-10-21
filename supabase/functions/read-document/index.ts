@@ -7,30 +7,16 @@ import {
   CONTRACT_PROMPT, CONTRACT_SCHEMA, CONTRACT_SYSTEM, SCAN_PROMPT, SCAN_SCHEMA, SCAN_SYSTEM,
   cleanContract, cleanScan, type ContractResult, type ScanResult,
 } from "../_shared/reading.ts";
+import { cors, reply } from "../_shared/http.ts";
 
 const MODEL = "claude-opus-5-5";
 const IMAGE_LIMIT = 5_000_000; // Claude reads images up to 5 MB; the app shrinks photos well below this
-const ORIGINS = (Deno.env.get("APP_ORIGINS") ?? "https://tondolo.app").split(",").map((o) => o.trim());
 
 function encodeBase64(bytes: Uint8Array): string {
   let bin = "";
   for (let i = 0; i < bytes.length; i += 0x8000) bin += String.fromCharCode(...bytes.subarray(i, i + 0x8000));
   return btoa(bin);
 }
-
-function cors(req: Request) {
-  const origin = req.headers.get("Origin") ?? "";
-  return {
-    "Access-Control-Allow-Origin": ORIGINS.includes(origin) ? origin : ORIGINS[0],
-    "Access-Control-Allow-Headers": "authorization, apikey, content-type, x-client-info",
-    "Access-Control-Allow-Methods": "POST, OPTIONS",
-    Vary: "Origin",
-  };
-}
-
-// Every answer the app shows is plain, calm English; the code says which.
-const reply = (req: Request, status: number, body: Record<string, unknown>) =>
-  new Response(JSON.stringify(body), { status, headers: { ...cors(req), "Content-Type": "application/json" } });
 
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: cors(req) });

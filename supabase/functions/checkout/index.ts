@@ -3,9 +3,8 @@
 // until Mags says go live. The key never leaves the server.
 import { createClient } from "npm:@supabase/supabase-js@2.117.2";
 import { PRICE_CURRENCIES, STRIPE_VERSION, checkoutForm, keyKind, type PriceCurrency } from "../_shared/billing.ts";
-import { cors, reply } from "../_shared/http.ts";
+import { allowedOrigin, cors, reply } from "../_shared/http.ts";
 
-const ORIGINS = (Deno.env.get("APP_ORIGINS") ?? "https://tondolo.app").split(",").map((o) => o.trim());
 const APP = (Deno.env.get("APP_URL") ?? "https://tondolo.app").replace(/\/$/, "");
 const ID = /^[0-9a-f-]{36}$/i;
 
@@ -61,7 +60,7 @@ Deno.serve(async (req) => {
   const currency = String(body.currency ?? "").toUpperCase() as PriceCurrency;
   if (!PRICE_CURRENCIES.includes(currency)) return reply(req, 400, { error: "bad_request" });
   const origin = req.headers.get("Origin") ?? "";
-  const returnBase = ORIGINS.includes(origin) ? origin : APP;
+  const returnBase = allowedOrigin(origin) ? origin : APP;
 
   const s = await stripe("checkout/sessions", key!, {
     method: "POST",

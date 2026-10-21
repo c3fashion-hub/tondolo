@@ -4,12 +4,11 @@
 // to their own address only. Emails go through Resend; its key stays in Supabase's secrets.
 import { createClient } from "npm:@supabase/supabase-js@2.117.2";
 import { reminderEmail, summaryEmail, todayIn, type DueItem, type Email } from "../_shared/emails.ts";
+import { cors } from "../_shared/http.ts";
 
 const FROM = Deno.env.get("REMINDER_FROM") ?? "Tondolo <hello@tondolo.app>";
 const APP = (Deno.env.get("APP_URL") ?? "https://tondolo.app").replace(/\/$/, "");
 
-const json = (body: unknown, status = 200) =>
-  new Response(JSON.stringify(body), { status, headers: { "Content-Type": "application/json", "Access-Control-Allow-Origin": APP, "Access-Control-Allow-Headers": "authorization, apikey, content-type, x-client-info" } });
 
 type Outgoing = { to: string; email: Email; log: { wedding_id: string; member_id: string; payment_id: string | null; kind: string; sent_for: string }[] };
 
@@ -29,6 +28,8 @@ async function send(key: string, out: Outgoing[]): Promise<Outgoing[]> {
 }
 
 Deno.serve(async (req) => {
+  const json = (body: unknown, status = 200) =>
+    new Response(JSON.stringify(body), { status, headers: { ...cors(req), "Content-Type": "application/json" } });
   if (req.method === "OPTIONS") return json(null);
   const key = Deno.env.get("RESEND_API_KEY");
   if (!key) return json({ ok: false, error: "not_configured" }, 503);

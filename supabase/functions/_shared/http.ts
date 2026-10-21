@@ -1,10 +1,15 @@
-// CORS and JSON replies for the app's own functions. Only the app's origins may call them.
-const ORIGINS = (Deno.env.get("APP_ORIGINS") ?? "https://tondolo.app").split(",").map((o) => o.trim());
+// CORS and JSON replies for the app's own functions. Only the app's own addresses may call them:
+// tondolo.app, its Netlify site and branch copies, local development, and any in APP_ORIGINS.
+// (Every call also needs the person's sign-in, so this isn't what keeps data private.)
+const ORIGINS = (Deno.env.get("APP_ORIGINS") ?? "https://tondolo.app").split(",").map((o) => o.trim()).filter(Boolean);
+const OWN = [/^https:\/\/(www\.)?tondolo\.app$/, /^https:\/\/([a-z0-9-]+--)?tondolo\.netlify\.app$/, /^http:\/\/localhost:\d+$/];
+
+export const allowedOrigin = (origin: string) => ORIGINS.includes(origin) || OWN.some((r) => r.test(origin));
 
 export function cors(req: Request) {
   const origin = req.headers.get("Origin") ?? "";
   return {
-    "Access-Control-Allow-Origin": ORIGINS.includes(origin) ? origin : ORIGINS[0],
+    "Access-Control-Allow-Origin": allowedOrigin(origin) ? origin : ORIGINS[0] ?? "https://tondolo.app",
     "Access-Control-Allow-Headers": "authorization, apikey, content-type, x-client-info",
     "Access-Control-Allow-Methods": "POST, OPTIONS",
     Vary: "Origin",
