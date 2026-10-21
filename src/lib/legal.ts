@@ -9,7 +9,7 @@ export type LegalSection = { heading: string; paragraphs: string[] };
 
 export const PRIVACY: LegalSection[] = [
   { heading: "Who we are", paragraphs: [
-    "Tondolo is run by The Wedding Godmother ([legal name and address]). We decide how your information is used, so we are its controller under UK data protection law (UK GDPR). Questions or requests: [contact email]. ICO registration: [number].",
+    "Tondolo is run and sold by La Jet Fête ([full legal name, for example “La Jet Fête Ltd”, company number and registered address]). We decide how your information is used, so we are its controller under UK data protection law (UK GDPR). Questions or requests: [contact email]. ICO registration: [number].",
   ] },
   { heading: "What we keep", paragraphs: [
     "Your email address, so you can sign in. The first names you choose to give. Your wedding's date, place and home currency, and any budget you set. The payments, suppliers, reminders and notes you add, and the documents you upload.",
@@ -52,7 +52,7 @@ export const TERMS: LegalSection[] = [
     "The Protection Kit and the tips in the app are general information, not legal or financial advice. Check with your card provider, bank or a professional.",
   ] },
   { heading: "Paying for Tondolo", paragraphs: [
-    "One payment of £49, US$59 or €55, tax included. No subscription. Stripe sells Tondolo to you as the seller of record and handles the tax.",
+    "One payment of £49, US$59 or €55, tax included. No subscription. Tondolo is a La Jet Fête product; Stripe sells it to you as the seller of record and handles the tax.",
     "It covers one wedding, for up to 5 people, until 12 months after the wedding date.",
   ] },
   { heading: "Cancelling and refunds", paragraphs: [
