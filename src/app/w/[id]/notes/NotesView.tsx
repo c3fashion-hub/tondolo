@@ -31,7 +31,7 @@ export function NotesView(props: NotesProps) {
   const router = useRouter();
   const box = useRef<HTMLTextAreaElement>(null);
   const [words, setWords] = useState("");
-  const [micHint, setMicHint] = useState(false);
+  const [micHint, setMicHint] = useState<"" | "phone" | "computer">("");
   const [result, setResult] = useState<NoteResult | null>(null);
   const [ticked, setTicked] = useState<boolean[]>([]);
   const [busy, setBusy] = useState<"" | "reading" | "saving">("");
@@ -44,9 +44,11 @@ export function NotesView(props: NotesProps) {
   const supplierName = (id: string | null) => props.suppliers.find((s) => s.id === id)?.name ?? null;
   const ctx = { suppliers: props.suppliers, payments: props.payments, today, fallbackCurrency };
 
+  // Voice notes use the phone keyboard's own microphone (no speech service). On a computer there's
+  // no keyboard microphone, so say how to dictate there, or to type.
   function speak() {
     box.current?.focus();
-    setMicHint(true);
+    setMicHint(navigator.maxTouchPoints > 0 ? "phone" : "computer");
   }
 
   async function suggest() {
@@ -68,7 +70,7 @@ export function NotesView(props: NotesProps) {
   }
 
   function reset(message: string) {
-    setWords(""); setResult(null); setTicked([]); setMicHint(false); setSaved(message);
+    setWords(""); setResult(null); setTicked([]); setMicHint(""); setSaved(message);
   }
 
   async function save() {
@@ -165,7 +167,9 @@ export function NotesView(props: NotesProps) {
       <section className="tn-stack" aria-label="New note" style={{ gap: 10 }}>
         <div className={styles.micRow}>
           <MicButton onClick={speak} />
-          <span className={styles.hint} aria-live="polite">{micHint ? "Now tap the microphone on your keyboard and speak." : "Uses your keyboard’s microphone."}</span>
+          <span className={styles.hint} aria-live="polite">{micHint === "phone" ? "Now tap the microphone on your keyboard and speak."
+            : micHint === "computer" ? "On a computer, type your note, or use dictation: press the Fn key twice on a Mac, or Windows key + H on Windows."
+              : "Uses your phone keyboard’s microphone."}</span>
         </div>
         <div className="tn-field">
           <label className="tn-field-label" htmlFor="note-words">Your note</label>

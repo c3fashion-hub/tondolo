@@ -25,7 +25,7 @@ test("\"Paid the florist 500 euros in cash\" suggests the right payment, saved o
   await expect(page.getByRole("checkbox", { name: /Confirm the terrace or the lawn with the Quinta/ })).not.toBeChecked();
   await page.getByRole("button", { name: "Speak a note" }).click();
   await expect(page.getByRole("textbox", { name: "Your note" })).toBeFocused();
-  await expect(page.getByText("Now tap the microphone on your keyboard and speak.")).toBeVisible();
+  await expect(page.getByText("Now tap the microphone on your keyboard and speak.")).toBeVisible(); // the tests run as a phone
   await page.getByRole("textbox", { name: "Your note" }).fill("Paid the florist 500 euros in cash");
   await page.getByRole("button", { name: "Suggest what to file" }).click();
   const option = page.getByRole("checkbox", { name: "Add a paid payment: Florist, €500, cash" });
@@ -74,6 +74,15 @@ test("Ask a question answers from the wedding, shown and read aloud", async ({ p
   await expect(sheet.getByText("We read this automatically. Check every amount and date before you save.")).toBeVisible();
   await expect.poll(() => page.evaluate(() => (window as unknown as { said: string[] }).said.length)).toBe(1);
   expect((await axe(page)).violations).toEqual([]);
+});
+
+test("on a computer, Speak a note explains how to dictate or type", async ({ browser }) => {
+  const computer = await browser.newContext({ hasTouch: false, isMobile: false, viewport: { width: 1280, height: 800 }, baseURL: `http://localhost:${PREVIEW_PORT}` });
+  const page = await computer.newPage();
+  await page.goto("/dev/money?screen=notes");
+  await page.getByRole("button", { name: "Speak a note" }).click();
+  await expect(page.getByText(/On a computer, type your note, or use dictation/)).toBeVisible();
+  await computer.close();
 });
 
 test("notes and the briefing look right at 320px", async ({ page }) => {
