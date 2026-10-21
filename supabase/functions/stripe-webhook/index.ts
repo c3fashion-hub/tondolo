@@ -8,9 +8,15 @@ const ok = (note: string) => new Response(JSON.stringify({ received: true, note 
 
 Deno.serve(async (req) => {
   if (req.method !== "POST") return new Response("method", { status: 405 });
-  const secret = Deno.env.get("STRIPE_WEBHOOK_SECRET") ?? "";
+  const raw = Deno.env.get("STRIPE_WEBHOOK_SECRET") ?? "";
+  const secret = raw.trim(); // a stray space or line break from copying shouldn't break it
   const payload = await req.text();
   if (!(await verifyStripeSignature(payload, req.headers.get("Stripe-Signature"), secret))) {
+    // Never the secret itself: only whether one is set and looks right, to help set-up.
+    console.error("stripe-webhook: signature refused", JSON.stringify({
+      secret_set: !!secret, looks_like_whsec: secret.startsWith("whsec_"), had_spaces: raw !== secret,
+      header_present: !!req.headers.get("Stripe-Signature"),
+    }));
     return new Response(JSON.stringify({ error: "bad_signature" }), { status: 400, headers: { "Content-Type": "application/json" } });
   }
   // deno-lint-ignore no-explicit-any
