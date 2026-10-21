@@ -9,7 +9,7 @@ export type LegalSection = { heading: string; paragraphs: string[] };
 
 export const PRIVACY: LegalSection[] = [
   { heading: "Who we are", paragraphs: [
-    "Tondolo is run and sold by La Jet Fete, a company registered in England and Wales (company number 08128269), 43 Berkeley Square, London W1J 5FJ. We decide how your information is used, so we are its controller under UK data protection law (UK GDPR). Questions or requests: [contact email]. ICO registration: [number].",
+    "Tondolo is run and sold by La Jet Fete, a company registered in England and Wales (company number 08128269), 43 Berkeley Square, London W1J 5FJ. We decide how your information is used, so we are its controller under UK data protection law (UK GDPR). Questions or requests: help@tondolo.app. ICO registration: [number].",
   ] },
   { heading: "What we keep", paragraphs: [
     "Your email address, so you can sign in. The first names you choose to give. Your wedding's date, place and home currency, and any budget you set. The payments, suppliers, reminders and notes you add, and the documents you upload.",
@@ -35,7 +35,7 @@ export const PRIVACY: LegalSection[] = [
     "The owner can delete the whole wedding, and the accounts of everyone on it, in Settings (Delete everything). Anyone else can delete their own account there. Uploaded files are removed within the hour.",
   ] },
   { heading: "Your rights", paragraphs: [
-    "You can see and download everything we hold about your wedding (Settings, Download a spreadsheet), correct it in the app, delete it, or ask us to stop using it. Contact [contact email] for anything else.",
+    "You can see and download everything we hold about your wedding (Settings, Download a spreadsheet), correct it in the app, delete it, or ask us to stop using it. Contact help@tondolo.app for anything else.",
     "If you're unhappy with how we've handled your information, you can complain to the Information Commissioner's Office (ico.org.uk).",
   ] },
   { heading: "Cookies", paragraphs: [
@@ -66,6 +66,6 @@ export const TERMS: LegalSection[] = [
     "[Limits of responsibility, to be written with a solicitor.]",
   ] },
   { heading: "The law that applies", paragraphs: [
-    "[England and Wales, to be confirmed.] Questions: [contact email].",
+    "[England and Wales, to be confirmed.] Questions: help@tondolo.app.",
   ] },
 ];
