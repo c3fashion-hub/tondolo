@@ -9,7 +9,7 @@ export type LegalSection = { heading: string; paragraphs: string[] };
 
 export const PRIVACY: LegalSection[] = [
   { heading: "Who we are", paragraphs: [
-    "Tondolo is run and sold by La Jet Fete Ltd, a company registered in England and Wales (company number 08128269), 43 Berkeley Square, London W1J 5FJ. We decide how your information is used, so we are its controller under UK data protection law (UK GDPR). Questions or requests: help@tondolo.app. ICO registration: [number].",
+    "Tondolo is run and sold by La Jet Fete Ltd, a company registered in England and Wales (company number 08128269), 43 Berkeley Square, London W1J 5FJ. We decide how your information is used, so we are its controller under UK data protection law (UK GDPR). Questions or requests: help@tondolo.app. Registered with the Information Commissioner's Office (ICO), registration number ZC177533.",
   ] },
   { heading: "What we keep", paragraphs: [
     "Your email address, so you can sign in. The first names you choose to give. Your wedding's date, place and home currency, and any budget you set. The payments, suppliers, reminders and notes you add, and the documents you upload.",
